@@ -6,7 +6,7 @@ To clone and start the app:
 
 For Ubunutu:
 1. Go into your directory and clone:
-`git clone https://github.com/mariamauco/Fall2025WEECSLarge`
+`git clone https://github.com/your-username/Fall2025WEECSLarge`
 
 2. Go into the react-app:
 `cd react-app`
