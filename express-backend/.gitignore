@@ -1,3 +1,11 @@
+.vscode/
+
 config.env
 .env
-.vscode/
+.env.*
+!.env.example
+
+node_modules/
+
+*.log
+logs/
