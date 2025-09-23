@@ -4,20 +4,16 @@ import './App.css';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Detection from './pages/Detection';
+import SignUp from './pages/SignUp';
 
 function App() {
   return (
       <Router>
-        <nav>
-          <Link to="/">Dashboard</Link> |{" "}
-          <Link to="/login">Login</Link> |{" "}
-          <Link to="/detection">Detection</Link>
-        </nav>
-
         <Routes>
           <Route path="/" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/detection" element={<Detection />} />
+          <Route path="/signup" element={<SignUp />} />
         </Routes>
       </Router>
   );
