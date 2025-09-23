@@ -1,13 +1,23 @@
 import * as React from 'react';
-import {Container, TextField, Typography, Box, Button, FormControl, InputLabel, Input, FormHelperText, createTheme, ThemeProvider} from '@mui/material';
+import {Container, TextField, Typography, Box, Button, FormControl, InputLabel, Input, FormHelperText, createTheme, ThemeProvider, Card} from '@mui/material';
+import earthIcon from '../assets/earth_guy.png';
 
 let theme = createTheme({
 
 });
 theme = createTheme(theme, {
     palette:{
+        // Green
         primary:{
-            main: '#619111'
+            main: '#C4D399',
+            light: '#E5EEC8',
+            dark: '#A8B87A'
+        },
+        // Pink
+        secondary: {
+            main: '#FCD5E5',
+            light: '#FEF0F5',
+            dark: '#F8B5C8'
         }
     }
 })
@@ -15,94 +25,203 @@ theme = createTheme(theme, {
 function Login() {
     return (
         <ThemeProvider theme={theme}>
-        {/* This fills the entire screen and splits into two */}
+        {/* Main container with gradient background */}
         <Container 
         maxWidth={false}
         disableGutters
         sx={{
             height: '100vh',
             display: 'flex',
-            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'center',
             width: '100vw',
+            background: 'linear-gradient(135deg, #D4BFED 0%, #FCD5E5 50%, #E5EEC8 100%)',
+            padding: 0,
+            margin: 0
         }}
         >
-        <Container
+        {/* Main card container */}
+        <Card
             sx={{
-                height: '100vh',
-                display:'flex',
-                flexDirection: 'column',
-                width: '40vw',
-                backgroundColor:'#394508',
-                marginLeft:'0px'
-            }}> 
-            <Container sx={{display:'flex', flexDirection: 'row', height:'5vh', margin:'1vh'}}>
-                <Typography variant="h6" sx={{ color: 'white', marginRight:'35vh', padding:'1vh' }}
-                >A Waste Sorting App</Typography>
-                <Button sx={{backgroundColor:'#D2FD9C', color: 'black', padding:'1vh', margin:'8px', borderRadius: '5px'}} >Get Started</Button>
-            </Container>
-
-            <Box sx={{margin:'1vh', marginTop:'3vh'}}>
-                <Typography variant="h2" sx={{ color: 'white'}}>
-                    Recyclying Made 
-                </Typography>
-                <Typography variant="h2" sx={{ color: '#D2FD9C'}}>
-                    Easy
-                </Typography>
-            </Box>
-
-            <Box sx={{display:'flex', flexDirection: 'column', justifyContent:'center', alignItems:'center'}}// Log In form 
-            >
-                <Container sx={{display:'flex', flexDirection: 'row', justifyContent:'center', margin:'3vh'}}>
-                    <Typography variant="h2" sx={{ color: 'white', marginRight:'1vh'}}>Log In</Typography>
-                    <Typography variant="h2" sx={{ color: '#A5CEA0', marginLeft:'1vh'}}>Sign In</Typography>
-                </Container>
-                <TextField 
-                    id="outlined-basic" 
-                    label="Enter Username/Email" 
-                    variant="outlined"
-                    sx={{marginBottom:'2vh',width:'35vh', 
-                        '& .MuiOutlinedInput-root': { 
-                            backgroundColor: 'primary.main', 
-                            color:'#ffffff', 
-                            borderRadius: '15px', 
-                            '& fieldset': {borderColor: 'white !important'}
-                        },'& .MuiInputLabel-root':{ color: '#97CA8B'}
-                    }}
-                />
-                <TextField 
-                    id="outlined-basic" 
-                    label="Enter Password" 
-                    variant="outlined"
-                    sx={{
-                        marginBottom:'2vh', 
-                        width:'35vh', 
-                        '& .MuiOutlinedInput-root': { 
-                            backgroundColor: 'primary.main', 
-                            color:'#ffffff', 
-                            borderRadius: '15px',
-                            '& fieldset': { borderColor: 'white !important'}
-                        },'& .MuiInputLabel-root':{ color: '#97CA8B'}
-                    }}
-                />
-                <Button sx={{width:'10vh',padding:'1vh',backgroundColor:'primary.main', color:'white', borderRadius: '15px',borderColor: 'white', border:'1px solid white'}}>Log In</Button>
-            </Box>
-            
-
-            </Container>
-
-
-
-            <Container
-            sx={{
-                height: '100vh',
-                display:'flex',
+                display: 'flex',
                 flexDirection: 'row',
-                width: '40vw',
-                backgroundColor:'#ffffffff'
-            }}>
+                width: '800px',
+                height: '500px',
+                borderRadius: '20px',
+                boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
+                overflow: 'hidden'
+            }}
+        >
+            {/* Left promotional section */}
+            <Box
+                sx={{
+                    width: '50%',
+                    backgroundColor: 'secondary.light',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '40px',
+                    position: 'relative'
+                }}
+            >
+                {/* Earth character icon */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginBottom: '30px'
+                    }}
+                >
+                    <img 
+                        src={earthIcon} 
+                        alt="Earth character" 
+                        style={{
+                            width: '250px',
+                            height: '250px',
+                            objectFit: 'contain'
+                        }}
+                    />
+                </Box>
+                
+                {/* Branding text */}
+                <Typography 
+                    variant="h4" 
+                    sx={{ 
+                        color: 'secondary.dark', 
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        marginBottom: '10px',
+                        textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+                    }}
+                >
+                    Recycle Smarter.
+                </Typography>
+                <Typography 
+                    variant="h4" 
+                    sx={{ 
+                        color: 'secondary.dark', 
+                        fontWeight: 'bold',
+                        textAlign: 'center',
+                        textShadow: '0 1px 2px rgba(255,255,255,0.8)'
+                    }}
+                >
+                    Track Your Impact.
+                </Typography>
+            </Box>
 
-            </Container>
-            
+            {/* Right login form section */}
+            <Box
+                sx={{
+                    width: '50%',
+                    backgroundColor: 'white',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    padding: '40px'
+                }}
+            >
+                {/* Login title */}
+                <Typography 
+                    variant="h4" 
+                    sx={{ 
+                        color: 'primary.main', 
+                        fontWeight: 'bold',
+                        marginBottom: '40px'
+                    }}
+                >
+                    Log In
+                </Typography>
+
+                {/* Email field */}
+                <TextField 
+                    id="email-field" 
+                    placeholder="username@email.com"
+                    variant="outlined"
+                    fullWidth
+                    sx={{
+                        marginBottom: '20px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
+
+                {/* Password field */}
+                <TextField 
+                    id="password-field" 
+                    placeholder="Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    sx={{
+                        marginBottom: '30px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
+
+                {/* Login button */}
+                <Button 
+                    variant="contained"
+                    fullWidth
+                    sx={{
+                        backgroundColor: 'primary.main',
+                        color: 'white',
+                        borderRadius: '10px',
+                        padding: '12px',
+                        fontSize: '16px',
+                        fontWeight: 'bold',
+                        marginBottom: '20px',
+                        '&:hover': {
+                            backgroundColor: 'primary.dark'
+                        }
+                    }}
+                >
+                    Login
+                </Button>
+
+                {/* Sign up link */}
+                <Typography sx={{ color: '#666', fontSize: '14px' }}>
+                    Don't have an account? 
+                    <Button 
+                        sx={{ 
+                            color: 'primary.main', 
+                            textTransform: 'none',
+                            fontSize: '14px',
+                            fontWeight: 'bold',
+                            padding: '0 4px',
+                            minWidth: 'auto'
+                        }}
+                    >
+                        Sign Up
+                    </Button>
+                </Typography>
+            </Box>
+        </Card>
         </Container>
         </ThemeProvider>
     );
