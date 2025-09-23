@@ -1,15 +1,11 @@
-import express from "express";
-import cors from "cors";
-import records from ".routes/records.js";
+// Start server here
 
-const PORT = process.env.PORT || 5050;
-const app = express();
+//import express from "express";
 
-app.use(cors());
-app.use(express.json());
-app.use("/record",records)
+const PORT = process.env.PORT || 5050; //http://localhost:5050/
+const app = require('./app');
 
 //start express server
 app.listen(PORT,() => {
-    console.log('Server listening on port ${PORT}');
+    console.log(`Server listening on port ${PORT}`);
 })
