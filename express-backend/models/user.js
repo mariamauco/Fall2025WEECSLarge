@@ -6,7 +6,7 @@ const UserSchema = new mongoose.Schema(
         username: {type: String, required: true, unique: true},
         email: {type: String, required: true, unique:true},
         password: {type: String, required: true},
-        joinDate: {type: Date, default: Date.now},
+        // joinDate: {type: Date, default: Date.now} automatically added as createdAt
         points: {type: Number, default: 0}
         //consider others: numberScans,etc 
         // 
