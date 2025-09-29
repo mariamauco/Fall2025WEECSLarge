@@ -25,11 +25,11 @@ theme = createTheme(theme, {
     }
 })
 
-function Login() {
+function SignUp() {
     const navigate = useNavigate();
 
-    const handleSignUpClick = () => {
-        navigate('/signup');
+    const handleLoginClick = () => {
+        navigate('/login');
     };
 
     return (
@@ -132,7 +132,7 @@ function Login() {
                     padding: '40px'
                 }}
             >
-                {/* Login title */}
+                {/* Sign Up title */}
                 <Typography 
                     variant="h4" 
                     sx={{ 
@@ -141,7 +141,7 @@ function Login() {
                         marginBottom: '40px'
                     }}
                 >
-                    Log In
+                    Create an account
                 </Typography>
 
                 {/* Email field */}
@@ -190,7 +190,7 @@ function Login() {
                         ),
                     }}
                     sx={{
-                        marginBottom: '30px',
+                        marginBottom: '20px',
                         '& .MuiOutlinedInput-root': { 
                             borderRadius: '10px',
                             '& fieldset': {
@@ -207,7 +207,39 @@ function Login() {
                     }}
                 />
 
-                {/* Login button */}
+                {/* Confirm Password field */}
+                <TextField 
+                    id="confirm-password-field" 
+                    placeholder="Confirm Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Lock sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        marginBottom: '30px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: 'gray',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
+
+                {/* Sign Up button */}
                 <Button 
                     variant="contained"
                     fullWidth
@@ -224,14 +256,14 @@ function Login() {
                         }
                     }}
                 >
-                    Login
+                    Sign Up
                 </Button>
 
                 {/* Sign up link */}
                 <Typography sx={{ color: '#666', fontSize: '14px' }}>
-                    Don't have an account? 
+                    Already have an account? 
                     <Button 
-                        onClick={handleSignUpClick}
+                        onClick={handleLoginClick}
                         sx={{ 
                             color: 'primary.main', 
                             textTransform: 'none',
@@ -241,7 +273,7 @@ function Login() {
                             minWidth: 'auto'
                         }}
                     >
-                        Sign Up
+                        Log In
                     </Button>
                 </Typography>
             </Box>
@@ -251,4 +283,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default SignUp;
