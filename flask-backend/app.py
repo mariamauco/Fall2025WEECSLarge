@@ -1,5 +1,5 @@
 from flask import Flask, request, Response, jsonify, stream_with_content
-rom ultralytics import YOLO
+from ultralytics import YOLO
 
 model = YOLO("")
 
