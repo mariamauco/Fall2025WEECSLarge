@@ -1,0 +1,9 @@
+from flask import Flask, request, Response, jsonify, stream_with_content
+rom ultralytics import YOLO
+
+model = YOLO("")
+
+filepath = ''
+
+if __name__ = '__main__':
+    app.run(debug=True)

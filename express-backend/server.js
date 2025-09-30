@@ -9,7 +9,6 @@ app.get("/", (req, res) => {
   res.send("Server is running and connected to the database");
 });
 
-
 //start express server
 app.listen(PORT,() => {
     console.log(`Server listening on port ${PORT}`);
