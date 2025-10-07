@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment} from '@mui/material';
 import { Email, Lock } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import earthIcon from '../assets/earth_guy.png';
 
 let theme = createTheme({
@@ -28,9 +29,36 @@ theme = createTheme(theme, {
 function Login() {
     const navigate = useNavigate();
 
+    // Login form state
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    
     const handleSignUpClick = () => {
         navigate('/signup');
     };
+
+    const handleSubmit = async () => {
+        try {
+            const response = await fetch('http://138.197.16.179:5050/api/users/login', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                console.log('Login successful');
+                console.log(data);
+                navigate('/dashboard');
+            } else {
+                console.error('Login failed');
+            }
+        } 
+        catch (error) {
+            console.error('Error logging in:', error);
+        }
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -150,6 +178,8 @@ function Login() {
                     placeholder="username@email.com"
                     variant="outlined"
                     fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -182,6 +212,8 @@ function Login() {
                     type="password"
                     variant="outlined"
                     fullWidth
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -209,6 +241,7 @@ function Login() {
 
                 {/* Login button */}
                 <Button 
+                    onClick={handleSubmit}
                     variant="contained"
                     fullWidth
                     sx={{

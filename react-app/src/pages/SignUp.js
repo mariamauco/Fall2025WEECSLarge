@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment} from '@mui/material';
 import { Email, Lock } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import earthIcon from '../assets/earth_guy.png';
 
 let theme = createTheme({
@@ -28,9 +29,43 @@ theme = createTheme(theme, {
 function SignUp() {
     const navigate = useNavigate();
 
+    // Sign up form state
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     const handleLoginClick = () => {
         navigate('/login');
     };
+
+    const handleSubmit = async () => {
+        // Make sure passwords match
+        if (password !== confirmPassword) {
+            console.error('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://138.197.16.179:5050/api/users/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                console.log('Login successful');
+                console.log(data);
+                navigate('/dashboard');
+            } else {
+                console.error('Login failed');
+            }
+        } 
+        catch (error) {
+            console.error('Error logging in:', error);
+        }
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -150,6 +185,8 @@ function SignUp() {
                     placeholder="username@email.com"
                     variant="outlined"
                     fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -182,6 +219,8 @@ function SignUp() {
                     type="password"
                     variant="outlined"
                     fullWidth
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -214,6 +253,8 @@ function SignUp() {
                     type="password"
                     variant="outlined"
                     fullWidth
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -243,6 +284,7 @@ function SignUp() {
                 <Button 
                     variant="contained"
                     fullWidth
+                    onClick={handleSubmit}
                     sx={{
                         backgroundColor: 'primary.main',
                         color: 'white',
