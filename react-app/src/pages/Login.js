@@ -42,7 +42,7 @@ function Login() {
             const response = await fetch('http://138.197.16.179:5050/api/users/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ email, password })
+                body: JSON.stringify({ username, email, password })
             });
             
             const data = await response.json();
