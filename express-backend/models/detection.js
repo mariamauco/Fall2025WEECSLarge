@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 
 const DetectionSchema = new mongoose.Schema({
-
-    userID:{type: Number, required: true},
+    // this makes sure the userID is referencing an actual user from user document
+    userID:{type: mongoose.Schema.Types.ObjectId, ref: "User", required: true}, 
     itemName:{type: String, required: true},
-    category:{type: String, required: true},
+    // references a specific category instance instead of the name of it
+    category:{type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true},
     timestamp:{type: Date, default: Date.now},
-    environSavings:{type: Number, default: 0}
-    //consider co2 savings or something else
+    // allow user to input quantity. used to calculate total environsavings from category
+    quantity:{type: Number, default: 1}
 
 })
 
