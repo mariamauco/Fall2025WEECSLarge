@@ -14,6 +14,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Load mongoose models so they're registered with Mongoose
+require('./models');
+
 //routes
 //app.use("/record", records)
 
