@@ -30,6 +30,7 @@ function Login() {
     const navigate = useNavigate();
 
     // Login form state
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     
@@ -175,7 +176,7 @@ function Login() {
                 {/* Email field */}
                 <TextField 
                     id="email-field" 
-                    placeholder="username@email.com"
+                    placeholder="Username or Email"
                     variant="outlined"
                     fullWidth
                     value={email}
