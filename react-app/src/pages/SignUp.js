@@ -2,6 +2,7 @@ import * as React from 'react';
 import {Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment} from '@mui/material';
 import { Email, Lock } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import earthIcon from '../assets/earth_guy.png';
 
 let theme = createTheme({
@@ -28,9 +29,46 @@ theme = createTheme(theme, {
 function SignUp() {
     const navigate = useNavigate();
 
+    // Sign up form state
+    const [last, setLast] = useState('');
+    const [first, setFirst] = useState('');
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+
     const handleLoginClick = () => {
         navigate('/login');
     };
+
+    const handleSubmit = async () => {
+        // Make sure passwords match
+        if (password !== confirmPassword) {
+            console.error('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://138.197.16.179:5050/api/users/register', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ username, email, password })
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                console.log('Login successful');
+                console.log(data);
+                navigate('/dashboard');
+            } else {
+                console.error('Login failed');
+            }
+        } 
+        catch (error) {
+            console.error('Error logging in:', error);
+        }
+    }
 
     return (
         <ThemeProvider theme={theme}>
@@ -55,7 +93,7 @@ function SignUp() {
                 display: 'flex',
                 flexDirection: 'row',
                 width: '800px',
-                height: '500px',
+                height: '650px',
                 borderRadius: '20px',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
                 overflow: 'hidden'
@@ -143,13 +181,119 @@ function SignUp() {
                 >
                     Create an account
                 </Typography>
+                
+                 {/* name field */}
+                <Box
+                sx={{display: 'flex'}}>
+                
+                <TextField 
+                    id="first-field" 
+                    placeholder="First Name"
+                    variant="outlined"
+                    fullWidth
+                    value={first}
+                    onChange={(e) => setFirst(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Email sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        flexDirection: 'row',
+                        marginRight: '15px',
+                        marginBottom: '20px',
 
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                /> {/* username field */}
+                <TextField 
+                    id="last-field" 
+                    placeholder="Last Name"
+                    variant="outlined"
+                    fullWidth
+                    value={last}
+                    onChange={(e) => setLast(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Email sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        flexDirection: 'row',
+                        marginBottom: '20px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
+                </Box>
+
+                {/* username field */}
+                <TextField 
+                    id="user-field" 
+                    placeholder="username"
+                    variant="outlined"
+                    fullWidth
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Email sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        marginBottom: '20px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
                 {/* Email field */}
                 <TextField 
                     id="email-field" 
-                    placeholder="username@email.com"
+                    placeholder="email@email.com"
                     variant="outlined"
                     fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -182,6 +326,8 @@ function SignUp() {
                     type="password"
                     variant="outlined"
                     fullWidth
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -214,6 +360,8 @@ function SignUp() {
                     type="password"
                     variant="outlined"
                     fullWidth
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -243,6 +391,7 @@ function SignUp() {
                 <Button 
                     variant="contained"
                     fullWidth
+                    onClick={handleSubmit}
                     sx={{
                         backgroundColor: 'primary.main',
                         color: 'white',
