@@ -1,18 +1,19 @@
 // For users API
 const express = require("express");
-const jwt = require("jsonwebtoken");
-
+const jwt = require("jsonwebtoken"); //provides secure login token
+const UserData = require("./models/user.js"); //path to schema file
 
 const { ObjectId } = require("mongodb");
 const db = require("../db/connection.js");
 
 const router = express.Router()
 
+const bcrypt = require("bcryptjs"); //safely compares entered pass to hashed pass in db
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
 
 
-//register user
-router.post("/register", async (req,res) =>{
+//register/signing up user
+router.post("/SignUp", async (req,res) =>{
     //API 
     try{
         const{name, username, email, password} = req.body;
