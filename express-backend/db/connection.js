@@ -30,7 +30,7 @@ const connectMongoose = async () => {
   }
 };
 
-// Provide a helper to get a native MongoDB client if raw collection access is desired
+// Provide a helper to get a native MongoDB client for collection access
 const getMongoClient = async () => {
   if (!ATLAS_URI) throw new Error('No ATLAS_URIS set in environment');
   const client = new MongoClient(ATLAS_URI, { useNewUrlParser: true, useUnifiedTopology: true });
