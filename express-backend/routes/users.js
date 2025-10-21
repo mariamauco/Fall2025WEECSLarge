@@ -11,23 +11,26 @@ const db = require("../db/connection.js");
 
 router.post("/Login", async (req, res) => {
   try{
+    console.log("0");
     const { email, password } = req.body;
-
+    console.log("1");
     //find user by email
     const user = await UserData.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid email or password" });
-
+    console.log("2");
     //compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
+    // implement hashing later
+    //const isMatch = await bcrypt.compare(password, user.password); 
+    const isMatch = password === user.password;
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
-
+    console.log("3");
     //create a token if email and pass are correct
     const token = jwt.sign(
       { id: user._id, username: user.username },
       "secret key from .env", //need to change to a env. variable
       { expiresIn: "1h" }
     );
-
+    console.log("4");
     //send response to frontend
     res.json({
       message: "Login successful!",
