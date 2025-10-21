@@ -15,5 +15,5 @@ const UserSchema = new mongoose.Schema(
     }, {timestamps: true} //automatically saves when doc was created}   
 )
 //compile model from schema
-const UserData = mongoose.model("UserData", UserSchema);
+const UserData = mongoose.model("UserData", UserSchema, "UserData"); // force it to use UserData
 module.exports = UserData;
