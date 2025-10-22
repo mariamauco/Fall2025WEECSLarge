@@ -1,0 +1,44 @@
+# This is the name of your GitHub Action
+name: Deploy to Droplet
+
+# This tells the action to run on every push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+# This defines the job that will run
+jobs:
+  deploy:
+    # We'll use the latest version of Ubuntu to run our job
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH into Droplet and Deploy
+        # This is a popular pre-made action for running SSH commands
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          # Get the secrets we just added in GitHub
+          host: ${{ secrets.DROPLET_HOST }}
+          username: ${{ secrets.DROPLET_USER }}
+          key: ${{ secrets.DROPLET_SSH_KEY }}
+
+          # This is the script that will run ON YOUR SERVER
+          # Make sure to change the paths and app name!
+          script: |
+            # Navigate to your project directory
+            cd Fall2025WEECSLarge/
+
+            # Pull the latest code from the main branch
+            git pull origin main
+
+            cd react-app/
+
+            # Install any new dependencies
+            npm install
+
+            # (Optional) Run a build step if you have one
+            npm run build
+
+            # Restart your app with PM2
+            pm2 restart frontend

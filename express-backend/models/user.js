@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const UserSchema = new mongoose.Schema(
     //fileId: {},//
     {
+        name: {type: String, required: true},
         username: {type: String, required: true, unique: true},
         email: {type: String, required: true, unique:true},
         password: {type: String, required: true},
@@ -14,5 +15,5 @@ const UserSchema = new mongoose.Schema(
     }, {timestamps: true} //automatically saves when doc was created}   
 )
 //compile model from schema
-const UserData = mongoose.model("User", UserSchema);
+const UserData = mongoose.model("UserData", UserSchema, "UserData"); // force it to use UserData
 module.exports = UserData;

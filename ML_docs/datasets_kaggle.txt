@@ -1,0 +1,32 @@
+https://www.kaggle.com/datasets/kaanerkez/waste-classfication-dataset
+{6800 images}
+{17, Battery - Various types of batteries
+Cardboard - Cardboard packaging and boxes
+Glass - Glass containers and bottles
+Keyboard - Computer keyboards and input devices
+Metal - Metal cans and metallic waste
+Microwave - Microwave ovens and similar appliances
+Mobile - Mobile phones and smartphones
+Mouse - Computer mice and peripherals
+Organic - Biodegradable organic waste
+Paper - Paper products and documents
+PCB - Printed Circuit Boards (electronic components)
+Plastic - Plastic containers and packaging
+Player - Media players and entertainment devices
+Printer - Printers and printing equipment
+Television - TV sets and display devices
+Trash - General mixed waste
+Washing Machine - Washing machines and large appliances}
+
+https://www.kaggle.com/datasets/mrgetshjtdone/vn-trash-classification
+{13k images}
+{9, Aluminum cans, Carton, Foam box, 
+Milk box, Paper, Paper cup, Clear plastic cup, 
+PET bottle and Other trash.}
+
+https://www.kaggle.com/datasets/davidsamuelsitorus/waste-classification
+{63k images}{7, Glass, Metal, Organic, Paper, Plastic, Residue, Toxic}
+
+https://www.kaggle.com/datasets/kandatiharshavardhan/recycle-dataset
+{2k??}
+{6, cardboard, glass, metal, paper, plastic, trash}

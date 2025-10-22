@@ -1,0 +1,59 @@
+https://universe.roboflow.com/thaifood/recycle-ovlpv
+{2.2kimages} {3, can , Glass_Bottle, Plastic_Bottle}
+
+https://universe.roboflow.com/test-6db4g/recycle-xjjdg
+{3.1 images}{5, cans
+garbage
+k
+paper
+plastic
+}
+
+https://universe.roboflow.com/recycle-mvp1c/recycle-2qkgu
+{1.2k}{5, battery
+cardboard
+glass
+metal
+plastic}
+
+https://universe.roboflow.com/1453/recycle-ihloi
+{873 images}{Aluminum
+Glass
+Paper
+Plastic}
+
+https://universe.roboflow.com/final-kuqrl/recycle-0mpfl
+{4k}{4, can
+glass
+paperpack
+plastic}
+
+https://universe.roboflow.com/recycle-yavqd/recycle-22zzy
+{2.5k} {6, cardboard
+glass
+metal
+paper
+plastic
+trash}
+
+https://universe.roboflow.com/yolov8-zrsds/recycle-tkdhw
+{19k}{glass
+metal
+paper
+plastic}
+
+https://universe.roboflow.com/kaka-6coud/recycle-3thqg
+{2.3k}{5, Bin
+Glass
+Metal
+Other
+Plastic}
+
+https://universe.roboflow.com/waste-rq8p9/recycle-byjdj
+{2.4k}{7,broken_glass
+can
+electronic
+food_can
+glass_bottle
+glass_cup
+plastic_bottle}
