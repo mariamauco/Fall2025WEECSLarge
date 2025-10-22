@@ -1,6 +1,8 @@
-import React, { useRef } from "react";
-import { Box, Paper, Button, Container, createTheme, ThemeProvider } from "@mui/material";
+import * as React from 'react';
+import { useRef, useState, useEffect } from "react";
+import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography } from "@mui/material";
 import wasteImage from "../assets/waste_placeholder.jpg";
+import { useNavigate } from 'react-router-dom';
 
 let theme = createTheme({});
 theme = createTheme(theme, {
@@ -23,6 +25,12 @@ theme = createTheme(theme, {
 
 function Detection() {
     const fileInputRef = useRef(null);
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
+    const [predictionResponse, setPredictionResponse] = useState(null);
+    const [uploadError, setUploadError] = useState(null);
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [previewUrl, setPreviewUrl] = useState(null);
 
     const handleUploadClick = () => {
         fileInputRef.current?.click();
@@ -32,8 +40,64 @@ function Detection() {
         const file = event.target.files[0];
         if (file) {
             console.log("Selected file:", file.name);
+            setSelectedFile(file);
+            // create a preview URL for the selected file
+            const url = URL.createObjectURL(file);
+            setPreviewUrl(url);
+        } else {
+            setSelectedFile(null);
+            setPreviewUrl(null);
         }
     };
+
+    const handleSubmit = async () => {
+        if (!previewUrl){
+            setMessage("Please enter an image")
+            return;
+        }
+        try{
+            const form = new FormData();
+            // Multer expects the file field to be named "image"
+            form.append('image', selectedFile, selectedFile.name); 
+
+            const username = localStorage.getItem('username') || 'testuser';
+            form.append('username', username);
+            form.append('quantity', '1');
+
+            const token = localStorage.getItem('token'); // example
+            const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+            // const response = await fetch('http://localhost:5050/api/predict',{ // if running server locally
+            const response = await fetch('http://138.197.16.179:5050/api/predict',{
+                method: 'POST',
+                headers,
+                body: form // passes the image using multer
+            });
+
+            const data = await response.json();
+            // IF SUCESSFUL THIS RETURNS: 
+            //    return res.status(200).json({
+            //    message: "Detection successful",
+            //    info: infoData, // this is the disposal and savings info (follows schema)
+            //    detect: detectionData, // this is the detection (follows schema)
+            //    filename: req.file.filename,
+            //    prediction
+            //  });
+
+            // IMPLEMENT REST OF HANDLESUBMIT
+
+            // handle if response is not ok
+
+            // handle if response is ok: save the full response to display in the UI
+
+        }catch(error){
+                console.error('Upload error', error);
+                setUploadError('Network error');
+                setPredictionResponse(null);
+        }
+    };
+
+    // NEXT TO IMPLEMENT: DISPLAY THE RESPONSE
 
     return (
         <ThemeProvider theme={theme}>
@@ -53,6 +117,11 @@ function Detection() {
                     gap: 4
                 }}
             >
+            {message && (
+                <Typography sx={{ color: messageType === 'error' ? 'red' : 'green', mb: 2 }}>
+                    {message}
+                </Typography>
+            )}
 
             {/* Camera Box */}
             <Paper
@@ -143,8 +212,8 @@ function Detection() {
                 >
                     <Box
                         component="img"
-                        src={wasteImage}
-                        alt="Plastic waste"
+                        src={previewUrl || wasteImage}
+                        alt={previewUrl ? "Selected file preview" : "Plastic waste"}
                         sx={{
                             width: "100%",
                             height: "100%",
@@ -185,7 +254,31 @@ function Detection() {
                         }
                     }}
                 >
-                    Upload
+                    Upload Image
+                </Button>
+
+                <Button
+                    variant="contained"
+                    size="large"
+                    onClick={handleSubmit}
+                    sx={{
+                        borderColor: theme.palette.secondary.dark,
+                        color: theme.palette.secondary.dark,
+                        backgroundColor: "#fff",
+                        borderRadius: 2,
+                        paddingX: 4,
+                        paddingY: 1.5,
+                        fontSize: "1.1rem",
+                        fontWeight: 600,
+                        textTransform: "none",
+                        minWidth: 150,
+                        "&:hover": {
+                            borderColor: theme.palette.secondary.dark,
+                            backgroundColor: theme.palette.secondary.light,
+                            color: theme.palette.secondary.dark
+                        }
+                    }}>
+                    Submit
                 </Button>
 
                 {/* File input */}

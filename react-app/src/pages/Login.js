@@ -33,8 +33,6 @@ function Login() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [message, setMessage] = useState(null);
-    const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
     
     const handleSignUpClick = () => {
         navigate('/signup');
@@ -51,14 +49,11 @@ function Login() {
             const data = await response.json();
             
             if (response.ok) {
-                setMessage('Login successful! Redirecting...');
-                setMessageType('success');
-                setTimeout(() => navigate('/dashboard'), 600);
+                console.log('Login successful');
+                console.log(data);
+                navigate('/');
             } else {
-                console.error(data);
-                // try to extract a message from the server response
-                setMessage(data.message);
-                setMessageType('error');
+                console.error('Login failed');
             }
         } 
         catch (error) {
@@ -177,13 +172,6 @@ function Login() {
                 >
                     Log In
                 </Typography>
-
-                    {/* Server response message (error in red) */}
-                    {message && (
-                        <Typography sx={{ color: messageType === 'error' ? 'red' : 'green', mb: 2 }}>
-                            {message}
-                        </Typography>
-                    )}
 
                 {/* Email field */}
                 <TextField 

@@ -12,6 +12,9 @@ app.get("/", (req, res) => {
 const usersRouter = require('./routes/users');
 app.use('/api/users', usersRouter);
 
+const predictsRouter = require('./routes/predicts');
+app.use('/api', predictsRouter);
+
 app.get("/", (req, res) => {
   res.send("Server is running and connected to the database");
 });

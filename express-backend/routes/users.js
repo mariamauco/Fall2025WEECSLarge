@@ -14,7 +14,7 @@ router.post("/Login", async (req, res) => {
     const { email, password } = req.body;
     //find user by email
     const user = await UserData.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid email or password" });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     // Compare passwords
     // implement hashing later
@@ -53,7 +53,7 @@ router.post("/SignUp", async (req,res) =>{
             return res.status(400).json({error:"All fields required"});
         }
         //check if user exists (username)
-        const userExists = await UserData.findOne({email});
+        const userExists = await UserData.findOne({username});
         if(userExists){
             return res.status(400).json({error:"Username already exists"});
         }

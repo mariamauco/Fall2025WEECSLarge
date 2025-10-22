@@ -12,6 +12,6 @@ const CategorySchema = new mongoose.Schema({
 
 })
 //compile model from schema
-const CategoryData= mongoose.model("Category",CategorySchema);
+const CategoryData= mongoose.model("Category", CategorySchema, "Category");
 
 module.exports = CategoryData;
