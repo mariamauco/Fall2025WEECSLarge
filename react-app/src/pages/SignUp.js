@@ -26,38 +26,54 @@ theme = createTheme(theme, {
     }
 })
 
-function Login() {
+function SignUp() {
     const navigate = useNavigate();
 
-    // Login form state
+    // Sign up form state
+    const [last, setLast] = useState('');
+    const [first, setFirst] = useState('');
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    
-    const handleSignUpClick = () => {
-        navigate('/signup');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
+
+    const handleLoginClick = () => {
+        navigate('/login');
     };
 
     const handleSubmit = async () => {
+        // Make sure passwords match
+        if (password !== confirmPassword) {
+            setMessageType('error');
+            setMessage('Passwords do not match');
+            return;
+        }
+
+        const name = first + " " + last;
+
         try {
-            const response = await fetch('http://138.197.16.179:5050/api/users/login', {
+            const response = await fetch('http://138.197.16.179:5050/api/users/SignUp', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ name, username, email, password })
             });
             
             const data = await response.json();
             
             if (response.ok) {
-                console.log('Login successful');
-                console.log(data);
-                navigate('/');
+                setMessageType('success');
+                setMessage('Registered sucessfully! Redirecting...');
+                setTimeout(() => navigate('/dashboard'), 600); // wait to display message
             } else {
-                console.error('Login failed');
+                setMessageType('error');
+                setMessage(data.error);
+                console.log(data.error)
             }
         } 
         catch (error) {
-            console.error('Error logging in:', error);
+            console.error('Error connecting to backend', error);
         }
     }
 
@@ -84,7 +100,7 @@ function Login() {
                 display: 'flex',
                 flexDirection: 'row',
                 width: '800px',
-                height: '500px',
+                height: '650px',
                 borderRadius: '20px',
                 boxShadow: '0 20px 40px rgba(0,0,0,0.1)',
                 overflow: 'hidden'
@@ -161,7 +177,7 @@ function Login() {
                     padding: '40px'
                 }}
             >
-                {/* Login title */}
+                {/* Sign Up title */}
                 <Typography 
                     variant="h4" 
                     sx={{ 
@@ -170,13 +186,124 @@ function Login() {
                         marginBottom: '40px'
                     }}
                 >
-                    Log In
+                    Create an account
                 </Typography>
+                
+                {/* Server response message (error in red) */}
+                {message && (
+                    <Typography sx={{ color: messageType === 'error' ? 'red' : 'green', mb: 2 }}>
+                        {message}
+                    </Typography>
+                )}
 
+                 {/* name field */}
+                <Box
+                sx={{display: 'flex'}}>
+                
+                <TextField 
+                    id="first-field" 
+                    placeholder="First Name"
+                    variant="outlined"
+                    fullWidth
+                    value={first}
+                    onChange={(e) => setFirst(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Email sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        flexDirection: 'row',
+                        marginRight: '15px',
+                        marginBottom: '20px',
+
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                /> {/* username field */}
+                <TextField 
+                    id="last-field" 
+                    placeholder="Last Name"
+                    variant="outlined"
+                    fullWidth
+                    value={last}
+                    onChange={(e) => setLast(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Email sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        flexDirection: 'row',
+                        marginBottom: '20px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
+                </Box>
+
+                {/* username field */}
+                <TextField 
+                    id="user-field" 
+                    placeholder="username"
+                    variant="outlined"
+                    fullWidth
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Email sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        marginBottom: '20px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: '#E0E0E0',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
                 {/* Email field */}
                 <TextField 
                     id="email-field" 
-                    placeholder="Username or Email"
+                    placeholder="email@email.com"
                     variant="outlined"
                     fullWidth
                     value={email}
@@ -223,7 +350,7 @@ function Login() {
                         ),
                     }}
                     sx={{
-                        marginBottom: '30px',
+                        marginBottom: '20px',
                         '& .MuiOutlinedInput-root': { 
                             borderRadius: '10px',
                             '& fieldset': {
@@ -240,11 +367,45 @@ function Login() {
                     }}
                 />
 
-                {/* Login button */}
+                {/* Confirm Password field */}
+                <TextField 
+                    id="confirm-password-field" 
+                    placeholder="Confirm Password"
+                    type="password"
+                    variant="outlined"
+                    fullWidth
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <Lock sx={{ color: 'gray' }} />
+                            </InputAdornment>
+                        ),
+                    }}
+                    sx={{
+                        marginBottom: '30px',
+                        '& .MuiOutlinedInput-root': { 
+                            borderRadius: '10px',
+                            '& fieldset': {
+                                borderColor: 'gray',
+                                borderWidth: '2px'
+                            },
+                            '&:hover fieldset': {
+                                borderColor: 'primary.main'
+                            },
+                            '&.Mui-focused fieldset': {
+                                borderColor: 'primary.main'
+                            }
+                        }
+                    }}
+                />
+
+                {/* Sign Up button */}
                 <Button 
-                    onClick={handleSubmit}
                     variant="contained"
                     fullWidth
+                    onClick={handleSubmit}
                     sx={{
                         backgroundColor: 'primary.main',
                         color: 'white',
@@ -258,14 +419,14 @@ function Login() {
                         }
                     }}
                 >
-                    Login
+                    Sign Up
                 </Button>
 
                 {/* Sign up link */}
                 <Typography sx={{ color: '#666', fontSize: '14px' }}>
-                    Don't have an account? 
+                    Already have an account? 
                     <Button 
-                        onClick={handleSignUpClick}
+                        onClick={handleLoginClick}
                         sx={{ 
                             color: 'primary.main', 
                             textTransform: 'none',
@@ -275,7 +436,7 @@ function Login() {
                             minWidth: 'auto'
                         }}
                     >
-                        Sign Up
+                        Log In
                     </Button>
                 </Typography>
             </Box>
@@ -285,4 +446,4 @@ function Login() {
     );
 }
 
-export default Login;
+export default SignUp;
