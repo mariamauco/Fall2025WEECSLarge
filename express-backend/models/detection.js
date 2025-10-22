@@ -13,5 +13,5 @@ const DetectionSchema = new mongoose.Schema({
 })
 
 //compile model from schema
-const DetectionData = mongoose.model("Detection",DetectionSchema);
+const DetectionData = mongoose.model("Detection", DetectionSchema, "Detection");
 module.exports = DetectionData;

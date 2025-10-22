@@ -36,6 +36,8 @@ function SignUp() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [message, setMessage] = useState(null);
+    const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
 
     const handleLoginClick = () => {
         navigate('/login');
@@ -44,29 +46,34 @@ function SignUp() {
     const handleSubmit = async () => {
         // Make sure passwords match
         if (password !== confirmPassword) {
-            console.error('Passwords do not match');
+            setMessageType('error');
+            setMessage('Passwords do not match');
             return;
         }
 
+        const name = first + " " + last;
+
         try {
-            const response = await fetch('http://138.197.16.179:5050/api/users/register', {
+            const response = await fetch('http://138.197.16.179:5050/api/users/SignUp', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ name, username, email, password })
             });
             
             const data = await response.json();
             
             if (response.ok) {
-                console.log('Login successful');
-                console.log(data);
-                navigate('/');
+                setMessageType('success');
+                setMessage('Registered sucessfully! Redirecting...');
+                setTimeout(() => navigate('/dashboard'), 600); // wait to display message
             } else {
-                console.error('Login failed');
+                setMessageType('error');
+                setMessage(data.error);
+                console.log(data.error)
             }
         } 
         catch (error) {
-            console.error('Error logging in:', error);
+            console.error('Error connecting to backend', error);
         }
     }
 
@@ -182,6 +189,13 @@ function SignUp() {
                     Create an account
                 </Typography>
                 
+                {/* Server response message (error in red) */}
+                {message && (
+                    <Typography sx={{ color: messageType === 'error' ? 'red' : 'green', mb: 2 }}>
+                        {message}
+                    </Typography>
+                )}
+
                  {/* name field */}
                 <Box
                 sx={{display: 'flex'}}>

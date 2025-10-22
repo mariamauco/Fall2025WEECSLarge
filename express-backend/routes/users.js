@@ -3,7 +3,7 @@ const express = require("express");
 const { ObjectId } = require("mongodb");
 const bcrypt = require("bcryptjs"); //safely compares entered pass to hashed pass in db
 const jwt = require("jsonwebtoken"); //provides secure login token
-const UserData = require("./models/user.js"); //path to schema file
+const UserData = require("../models/user.js"); //path to schema file
 const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
@@ -12,22 +12,21 @@ const db = require("../db/connection.js");
 router.post("/Login", async (req, res) => {
   try{
     const { email, password } = req.body;
-
     //find user by email
     const user = await UserData.findOne({ email });
-    if (!user) return res.status(400).json({ message: "Invalid email or password" });
+    if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    //compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
+    // Compare passwords
+    // implement hashing later
+    //const isMatch = await bcrypt.compare(password, user.password); 
+    const isMatch = password === user.password;
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
-
     //create a token if email and pass are correct
     const token = jwt.sign(
       { id: user._id, username: user.username },
       "secret key from .env", //need to change to a env. variable
       { expiresIn: "1h" }
     );
-
     //send response to frontend
     res.json({
       message: "Login successful!",
@@ -53,13 +52,15 @@ router.post("/SignUp", async (req,res) =>{
         if(!name | !username || !email || !password){
             return res.status(400).json({error:"All fields required"});
         }
-
-        const collection = await db.collection("users");
-        
+        //check if user exists (username)
+        const userExists = await UserData.findOne({username});
+        if(userExists){
+            return res.status(400).json({error:"Username already exists"});
+        }
         //check if user exists (email)
-        const exists = await collection.findOne({email});
-        if(exists){
-            return res.status(400).json({error:"User already exists"});
+        const emailExists = await UserData.findOne({email});
+        if(emailExists){
+            return res.status(400).json({error:"Email already linked to an account"});
         }
 
         //create user: look how to link to schema:
@@ -69,9 +70,9 @@ router.post("/SignUp", async (req,res) =>{
             email,
             password
         };
-        const result = await collection.insertOne(newUser);
+        const result = await UserData.create(newUser);
 
-        if(result.acknowledged){
+        if(result && result._id){
             res.status(200).json({message: "Registered succesfully", userId: result.insertedId})
 
         } else{
