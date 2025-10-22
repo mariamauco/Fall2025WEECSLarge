@@ -11,26 +11,22 @@ const db = require("../db/connection.js");
 
 router.post("/Login", async (req, res) => {
   try{
-    console.log("0");
     const { email, password } = req.body;
-    console.log("1");
     //find user by email
     const user = await UserData.findOne({ email });
     if (!user) return res.status(400).json({ message: "Invalid email or password" });
-    console.log("2");
-    //compare passwords
+
+    // Compare passwords
     // implement hashing later
     //const isMatch = await bcrypt.compare(password, user.password); 
     const isMatch = password === user.password;
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
-    console.log("3");
     //create a token if email and pass are correct
     const token = jwt.sign(
       { id: user._id, username: user.username },
       "secret key from .env", //need to change to a env. variable
       { expiresIn: "1h" }
     );
-    console.log("4");
     //send response to frontend
     res.json({
       message: "Login successful!",
@@ -52,19 +48,20 @@ router.post("/Login", async (req, res) => {
 router.post("/SignUp", async (req,res) =>{
     //API 
     try{
-        console.log("1");
         const{name, username, email, password} = req.body;
         if(!name | !username || !email || !password){
             return res.status(400).json({error:"All fields required"});
         }
-        console.log("2")
-        //check if user exists (email)
-        const exists = await UserData.findOne({email});
-        console.log("3")
-        if(exists){
-            return res.status(400).json({error:"User already exists"});
+        //check if user exists (username)
+        const userExists = await UserData.findOne({email});
+        if(userExists){
+            return res.status(400).json({error:"Username already exists"});
         }
-        console.log("4")
+        //check if user exists (email)
+        const emailExists = await UserData.findOne({email});
+        if(emailExists){
+            return res.status(400).json({error:"Email already linked to an account"});
+        }
 
         //create user: look how to link to schema:
         const newUser = {
