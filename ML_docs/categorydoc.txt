@@ -1,0 +1,12 @@
+{
+  "_id": {
+    "$oid": "68db5cf98aa7fffecae8e7df"
+  },	
+  "catName":"Plastic",
+  "disposalInstructions":"Goes to recycle bin.",
+  "environSavingsInfo": {
+    "co2": 82.8,
+    "energy": 0.7,
+    "water": 1.4
+  }
+}
