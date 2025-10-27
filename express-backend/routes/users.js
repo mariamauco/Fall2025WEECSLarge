@@ -8,6 +8,9 @@ const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
 
+route.get("/stats")
+
+route.get("/history")
 
 router.post("/Login", async (req, res) => {
   try{

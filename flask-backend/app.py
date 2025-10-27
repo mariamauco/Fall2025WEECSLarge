@@ -1,4 +1,4 @@
-from flask import Flask, request, Response, jsonify #stream_with_context #for live feedback?
+from flask import Flask, request, Response, jsonify, stream_with_context
 from ultralytics import YOLO
 
 app = Flask(__name__)
@@ -6,7 +6,7 @@ app = Flask(__name__)
 # load model
 model = YOLO("")
 
-filepath = ''
+filepath = 'best.pt'
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(port=5001)
