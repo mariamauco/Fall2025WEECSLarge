@@ -15,6 +15,10 @@ app.use('/api/users', usersRouter);
 const predictsRouter = require('./routes/predicts');
 app.use('/api', predictsRouter);
 
+//user stats and history
+const dashboardRouter = require('./routes/userStats');
+app.use('/api', dashboardRouter);
+
 app.get("/", (req, res) => {
   res.send("Server is running and connected to the database");
 });
@@ -23,3 +27,4 @@ app.get("/", (req, res) => {
 app.listen(PORT,() => {
     console.log(`Server listening on port ${PORT}`);
 })
+
