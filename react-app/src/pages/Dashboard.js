@@ -1,7 +1,9 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment, Grid, Avatar } from '@mui/material';
-import { EmojiEvents, Air, Leaderboard, History, Recycling } from '@mui/icons-material';
+import {EmojiEvents, Air, Leaderboard, History, Recycling, EventRepeat, CameraAlt} from '@mui/icons-material';
 import CardComponent from '../components/Card';
+import {useNavigate} from "react-router-dom";
 
 let theme = createTheme({
 
@@ -25,9 +27,18 @@ theme = createTheme(theme, {
 })
 
 function Dashboard() {
+    const navigate = useNavigate();
+
+    const handleDetectionClick = () => {
+        navigate('/detection');
+    };
+
     // Dummy data (for now)
     const userPoints = 100;
     const userName = "John Doe";
+    const totalRecycled = 38;
+    const streak = 4;
+    const co2Saved = (totalRecycled * 0.4) * 0.6; // fake formula
     const leaderboard = [
         {
             name: "John Doe",
@@ -104,13 +115,54 @@ function Dashboard() {
             titleColor: "secondary.dark",
             cardInfo: (
                 <Box>
-                    <Typography variant="h2" sx={{ 
-                        fontSize: '48px', 
-                        fontWeight: 'bold', 
+                    <Typography variant="h2" sx={{
                         marginBottom: '8px',
                         color: 'dimgray'
                     }}>
-                        {userPoints}
+                        <Box component="span" sx={{ fontSize: '48px', fontWeight: 'bold' }}>{co2Saved.toFixed(1)}</Box>
+                        <Box component="span" sx={{ fontSize: '18px', fontWeight: 'normal', color: 'darkgray' }}>lbs</Box>
+                    </Typography>
+                </Box>
+            ),
+            width: 200,
+            height: 150
+        },
+        // Items scanned/recycled card
+        {
+            title: "Items Recycled",
+            icon: <Recycling />,
+            backgroundColor: "white",
+            titleColor: "secondary.dark",
+            cardInfo: (
+                <Box>
+                    <Typography variant="h2" sx={{
+                        fontSize: '48px',
+                        fontWeight: 'bold',
+                        marginBottom: '8px',
+                        color: 'dimgray'
+                    }}>
+                        {totalRecycled}
+                    </Typography>
+                </Box>
+            ),
+            width: 200,
+            height: 150
+        },
+        // Streak card
+        {
+            title: "Daily Streak",
+            icon: <EventRepeat />,
+            backgroundColor: "white",
+            titleColor: "secondary.dark",
+            cardInfo: (
+                <Box>
+                    <Typography variant="h2" sx={{
+                        fontSize: '48px',
+                        fontWeight: 'bold',
+                        marginBottom: '8px',
+                        color: 'dimgray'
+                    }}>
+                        {streak}
                     </Typography>
                 </Box>
             ),
@@ -268,15 +320,45 @@ function Dashboard() {
         }}
         >
             {/* Greetings section */}
-            <Box sx={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '30px' }}>
                 <Typography variant="h2" sx={{ 
                     fontSize: '48px', 
-                    fontWeight: 'bold'
+                    fontWeight: 'bold',
+                    marginBottom: '25px'
                 }}>
                     <Box component="span" sx={{ color: 'dimgray' }}>Hi, </Box>
                     <Box component="span" sx={{ color: 'primary.dark' }}>{userName}</Box>
                     <Box component="span" sx={{ color: 'dimgray' }}>!</Box>
                 </Typography>
+                
+                {/* Scan Button */}
+                <Button
+                    onClick={handleDetectionClick}
+                    variant="contained"
+                    startIcon={<CameraAlt sx={{ fontSize: '1.5rem' }} />}
+                    sx={{
+                        background: 'linear-gradient(135deg, #A8B87A 0%, #C4D399 100%)',
+                        color: 'white',
+                        textTransform: 'none',
+                        fontWeight: 'bold',
+                        fontSize: '1.1rem',
+                        px: 4,
+                        py: 1.5,
+                        borderRadius: '25px',
+                        boxShadow: '0 4px 15px rgba(168, 184, 122, 0.4)',
+                        transition: 'all 0.3s ease-in-out',
+                        '&:hover': {
+                            background: 'linear-gradient(135deg, #95a36a 0%, #b5c88a 100%)',
+                            boxShadow: '0 6px 20px rgba(168, 184, 122, 0.6)',
+                            transform: 'translateY(-2px)'
+                        },
+                        '&:active': {
+                            transform: 'translateY(0px)'
+                        }
+                    }}
+                >
+                    Start Scanning
+                </Button>
             </Box>
 
             {/* Grid container for the cards */}
