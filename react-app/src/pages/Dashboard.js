@@ -1,5 +1,7 @@
 import * as React from 'react';
 import {Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment} from '@mui/material';
+import { EmojiEvents } from '@mui/icons-material';
+import CardComponent from '../components/Card';
 
 let theme = createTheme({
 
@@ -23,8 +25,12 @@ theme = createTheme(theme, {
 })
 
 function Dashboard() {
+    // Dummy data (for now)
+    const userPoints = 100;
+    
     return (
         <ThemeProvider theme={theme}>
+        
         {/* Main container with gradient background */}
         <Container 
         maxWidth={false}
@@ -40,6 +46,26 @@ function Dashboard() {
             margin: 0
         }}
         >
+            <CardComponent
+                title="Your Points"
+                icon={<EmojiEvents />}
+                backgroundColor="white"
+                titleColor="secondary.dark"
+                cardInfo={
+                    <Box>
+                        <Typography variant="h2" sx={{ 
+                            fontSize: '48px', 
+                            fontWeight: 'bold', 
+                            marginBottom: '8px',
+                            color: 'dimgray'
+                        }}>
+                            {userPoints}
+                        </Typography>
+                    </Box>
+                }
+                width={200}
+                height={150}
+            />
         </Container>
         </ThemeProvider>
     );
