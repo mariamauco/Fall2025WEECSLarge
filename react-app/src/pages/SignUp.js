@@ -40,7 +40,7 @@ function SignUp() {
     const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
 
     const handleLoginClick = () => {
-        navigate('/login');
+        navigate('/');
     };
 
     const handleSubmit = async () => {
