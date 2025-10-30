@@ -51,7 +51,7 @@ function Login() {
             if (response.ok) {
                 console.log('Login successful');
                 console.log(data);
-                navigate('/');
+                navigate('/dashboard');
             } else {
                 console.error('Login failed');
             }

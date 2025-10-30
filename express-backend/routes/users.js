@@ -8,11 +8,11 @@ const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
 
-route.get("/userStats")
+// router.get("/userStats")
 
-route.get("/history") //consider deleting if history is inside userStats
+// router.get("/history") //consider deleting if history is inside userStats
 
-router.post("/Login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try{
     const { email, password } = req.body;
     //find user by email
@@ -48,7 +48,7 @@ router.post("/Login", async (req, res) => {
 
 
 //register/signing up user
-router.post("/SignUp", async (req,res) =>{
+router.post("/signup", async (req,res) =>{
     //API 
     try{
         const{name, username, email, password} = req.body;
