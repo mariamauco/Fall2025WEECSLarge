@@ -8,6 +8,9 @@ const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
 
+route.get("/userStats")
+
+route.get("/history") //consider deleting if history is inside userStats
 
 router.post("/Login", async (req, res) => {
   try{
@@ -49,7 +52,7 @@ router.post("/SignUp", async (req,res) =>{
     //API 
     try{
         const{name, username, email, password} = req.body;
-        if(!name | !username || !email || !password){
+        if(!name || !username || !email || !password){ //fixed typo
             return res.status(400).json({error:"All fields required"});
         }
         //check if user exists (username)
@@ -73,7 +76,7 @@ router.post("/SignUp", async (req,res) =>{
         const result = await UserData.create(newUser);
 
         if(result && result._id){
-            res.status(200).json({message: "Registered succesfully", userId: result.insertedId})
+            res.status(200).json({message: "Registered succesfully", userId: result._id}) //return insert res
 
         } else{
             res.status(500).json({error: "Failed to create new user"});
