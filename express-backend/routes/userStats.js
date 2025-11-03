@@ -12,7 +12,8 @@ router.get('/stats/:userId', async (req, res) => {
       return res.status(400).json({ error: 'User not found' });
     }
 
-    res.status(200).json({username: user.username, 
+    res.status(200).json({name: user.name,
+                          username: user.username, 
                           points: user.points,
                           recycled: user.detectionsCount || 0
                           }); //succesful
