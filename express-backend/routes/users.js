@@ -15,8 +15,14 @@ const db = require("../db/connection.js");
 router.post("/login", async (req, res) => {
   try{
     const { email, password } = req.body;
-    //find user by email
-    const user = await UserData.findOne({ email });
+    //find user by email or username
+    const identifier = (req.body.email || req.body.username || '').trim().toLowerCase();
+    const user = await UserData.findOne({
+      $or: [
+        { email: identifier },
+        { username: identifier }
+      ]
+    });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
     // Compare passwords
