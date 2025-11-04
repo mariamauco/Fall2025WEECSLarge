@@ -1,5 +1,7 @@
 from flask import Flask, request, Response, jsonify, stream_with_context
 from ultralytics import YOLO
+from PIL import Image
+import io
 
 app = Flask(__name__)
 
@@ -7,9 +9,40 @@ filepath = 'best.pt'
 model = YOLO(filepath)
 
 # given an image, run the model and return a prediction
-def predict(image):
-    # TO IMPLEMENT
-    return "Cardboard" #placeholder
+def predict(image_bytes, return_image=True):
+    """Run YOLO on raw image bytes.
+    Returns:
+      detections: list of dicts
+      a BytesIO JPEG with boxes drawn
+    """
+    
+    # load image into PIL
+    img = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+
+    # run inference
+    results = model.predict(img, imgsz=640, conf=0.35, verbose=False)
+    r = results[0]
+    names = r.names
+
+    detections = []
+    for b in r.boxes:
+        cls = int(b.cls.item())
+        detections.append({
+            "class_id": cls,
+            "class_name": names[cls],
+            "confidence": float(b.conf.item()),
+            "bbox_xyxy": [float(x) for x in b.xyxy[0].tolist()],
+        })
+
+    if return_image:
+        # r.plot() returns BGR np.array; convert to RGB for PIL
+        plotted = r.plot()[:, :, ::-1]
+        buf = io.BytesIO()
+        Image.fromarray(plotted).save(buf, format="JPEG", quality=90)
+        buf.seek(0)
+        return detections, buf
+
+    return detections, None
 
 # Route that handles API calls for predictions
 # Given an image, use the model to run and return a prediction
