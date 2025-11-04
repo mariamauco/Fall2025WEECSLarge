@@ -2,16 +2,14 @@ const mongoose = require("mongoose");
 
 const CategorySchema = new mongoose.Schema({
     catName:{type: String, required: true, unique: true},
-    disposalInstructions:{type: String, required: true},
-    environSavingsInfo:{
-        co2: Number,
-        energy: Number,
-        water: Number
-    } 
-    // save co2, energy, and water savings in environSavingsInfo
-
+    disposalInfo:{type: String, required: true},
+    desc: {type: String},
+    co2: Number,
+    energy: Number,
+    water: Number,
+    links: {type: String}
 })
 //compile model from schema
-const CategoryData= mongoose.model("Category", CategorySchema, "Category");
+const CategoryData = mongoose.model("Category", CategorySchema, "categories");
 
 module.exports = CategoryData;
