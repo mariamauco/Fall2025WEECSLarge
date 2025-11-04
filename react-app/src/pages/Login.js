@@ -51,6 +51,11 @@ function Login() {
             if (response.ok) {
                 console.log('Login successful');
                 console.log(data);
+                
+                // Store user data in localStorage
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
                 navigate('/');
             } else {
                 console.error('Login failed');

@@ -28,61 +28,82 @@ theme = createTheme(theme, {
 
 function Dashboard() {
     const navigate = useNavigate();
+    
+    // State for user data
+    const [userPoints, setUserPoints] = useState(0);
+    const [userName, setUserName] = useState("Guest");
+    const [totalRecycled, setTotalRecycled] = useState(0);
+    const [streak, setStreak] = useState(0);
+    const [leaderboard, setLeaderboard] = useState([]);
+    const [history, setHistory] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleDetectionClick = () => {
         navigate('/detection');
     };
 
-    // Dummy data (for now)
-    const userPoints = 100;
-    const userName = "John Doe";
-    const totalRecycled = 38;
-    const streak = 4;
+    // Fetch user data from API
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Get user data from localStorage
+                const storedUser = localStorage.getItem('user');
+                const storedToken = localStorage.getItem('token');
+                
+                if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    const userId = user.id || user._id;
+                    
+                    // Extract first name from stored user data
+                    const firstName = user.name ? user.name.split(' ')[0] : (user.username || "Guest");
+                    setUserName(firstName);
+                    
+                    if (userId) {
+                        // Fetch user stats
+                        const statsResponse = await fetch(`http://138.197.16.179:5050/api/stats/${userId}`);
+                        
+                        if (statsResponse.ok) {
+                            const statsData = await statsResponse.json();
+                            
+                            setUserPoints(statsData.points || 0);
+                            setTotalRecycled(statsData.recycled || 0);
+                        }
+                        
+                        // Fetch user history (if endpoint is implemented)
+                        try {
+                            const historyResponse = await fetch(`http://138.197.16.179:5050/api/stats/history/${userId}`);
+                            if (historyResponse.ok) {
+                                const historyData = await historyResponse.json();
+                                setHistory(historyData || []);
+                            }
+                        } catch (err) {
+                            console.log('History endpoint not available yet');
+                        }
+                    }
+                }
+                
+                // Fetch leaderboard (if endpoint is implemented)
+                try {
+                    const leaderboardResponse = await fetch('http://138.197.16.179:5050/api/stats/userPoints');
+                    if (leaderboardResponse.ok) {
+                        const leaderboardData = await leaderboardResponse.json();
+                        setLeaderboard(leaderboardData || []);
+                    }
+                } catch (err) {
+                    console.log('Leaderboard endpoint not available yet');
+                }
+                
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        fetchUserData();
+    }, []);
+
     const co2Saved = (totalRecycled * 0.4) * 0.6; // fake formula
-    const leaderboard = [
-        {
-            name: "John Doe",
-            points: 100
-        },
-        {
-            name: "Jane Doe",
-            points: 90
-        },
-        {
-            name: "Jim Doe",
-            points: 80
-        },
-        {
-            name: "Jill Doe",
-            points: 70
-        },
-        {
-            name: "Jack Doe",
-            points: 60
-        }
-    ];
-    const history = [
-        {
-            name: "Plastic Bottle",
-            points: 100
-        },
-        {
-            name: "Metal Can",
-            points: 100
-        },
-        {
-            name: "Paper",
-            points: 100
-        },
-        {
-            name: "Glass Bottle",
-            points: 100
-        },
-        {
-            name: "Cardboard",
-            points: 100
-        }
-    ];
 
     // Define all the cards that will be displayed on the dashboard in order
     const cards = [
