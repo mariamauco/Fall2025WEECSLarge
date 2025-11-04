@@ -61,21 +61,21 @@ def predict_route():
     if not image_bytes:
         return jsonify({'prediction': [], 'error': 'no image provided'}), 400
     # run the predict function and store response in preds
-try:
-    detections, buf = predict(image_bytes, return_image=True)
+    try:
+        detections, buf = predict(image_bytes, return_image=True)
 
-    if buf:  # If an image was generated
-        from flask import send_file
-        return send_file(
-            buf,
-            mimetype="image/jpeg",
-            as_attachment=False
-        )
-    else:
-        return jsonify({"detections": detections})
-except Exception as e:
-    # Return error message on model fail
-    return jsonify({'detections': [], 'error': f'model error: {str(e)}'}), 500
+        if buf:  # If an image was generated
+            from flask import send_file
+            return send_file(
+                buf,
+                mimetype="image/jpeg",
+                as_attachment=False
+            )
+        else:
+            return jsonify({"detections": detections})
+    except Exception as e:
+        # Return error message on model fail
+        return jsonify({'detections': [], 'error': f'model error: {str(e)}'}), 500
 
 
 if __name__ == '__main__':
