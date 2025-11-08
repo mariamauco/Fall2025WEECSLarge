@@ -65,7 +65,16 @@ function SignUp() {
             if (response.ok) {
                 setMessageType('success');
                 setMessage('Registered sucessfully! Redirecting...');
-                setTimeout(() => navigate('/dashboard'), 600); // wait to display message
+                
+                // Store user data in localStorage
+                localStorage.setItem('user', JSON.stringify({ 
+                    id: data.userId,
+                    username: username,
+                    email: email,
+                    name: name
+                }));
+                
+                setTimeout(() => navigate('/'), 600); // wait to display message
             } else {
                 setMessageType('error');
                 setMessage(data.error);

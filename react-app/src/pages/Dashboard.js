@@ -28,61 +28,82 @@ theme = createTheme(theme, {
 
 function Dashboard() {
     const navigate = useNavigate();
+    
+    // State for user data
+    const [userPoints, setUserPoints] = useState(0);
+    const [userName, setUserName] = useState("Guest");
+    const [totalRecycled, setTotalRecycled] = useState(0);
+    const [streak, setStreak] = useState(0);
+    const [leaderboard, setLeaderboard] = useState([]);
+    const [history, setHistory] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     const handleDetectionClick = () => {
         navigate('/detection');
     };
 
-    // Dummy data (for now)
-    const userPoints = 100;
-    const userName = "John Doe";
-    const totalRecycled = 38;
-    const streak = 4;
+    // Fetch user data from API
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                // Get user data from localStorage
+                const storedUser = localStorage.getItem('user');
+                const storedToken = localStorage.getItem('token');
+                
+                if (storedUser) {
+                    const user = JSON.parse(storedUser);
+                    const userId = user.id || user._id;
+                    
+                    // Extract first name from stored user data
+                    const firstName = user.name ? user.name.split(' ')[0] : (user.username || "Guest");
+                    setUserName(firstName);
+                    
+                    if (userId) {
+                        // Fetch user stats
+                        const statsResponse = await fetch(`http://138.197.16.179:5050/api/stats/${userId}`);
+                        
+                        if (statsResponse.ok) {
+                            const statsData = await statsResponse.json();
+                            
+                            setUserPoints(statsData.points || 0);
+                            setTotalRecycled(statsData.recycled || 0);
+                        }
+                        
+                        // Fetch user history
+                        try {
+                            const historyResponse = await fetch(`http://138.197.16.179:5050/api/stats/history/${userId}`);
+                            if (historyResponse.ok) {
+                                const historyData = await historyResponse.json();
+                                setHistory(historyData || []);
+                            }
+                        } catch (err) {
+                            console.log('History endpoint not available yet');
+                        }
+                    }
+                }
+                
+                // Fetch leaderboard
+                try {
+                    const leaderboardResponse = await fetch('http://138.197.16.179:5050/api/stats/leaderboard');
+                    if (leaderboardResponse.ok) {
+                        const leaderboardData = await leaderboardResponse.json();
+                        setLeaderboard(leaderboardData || []);
+                    }
+                } catch (err) {
+                    console.log('Leaderboard endpoint not available yet');
+                }
+                
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        
+        fetchUserData();
+    }, []);
+
     const co2Saved = (totalRecycled * 0.4) * 0.6; // fake formula
-    const leaderboard = [
-        {
-            name: "John Doe",
-            points: 100
-        },
-        {
-            name: "Jane Doe",
-            points: 90
-        },
-        {
-            name: "Jim Doe",
-            points: 80
-        },
-        {
-            name: "Jill Doe",
-            points: 70
-        },
-        {
-            name: "Jack Doe",
-            points: 60
-        }
-    ];
-    const history = [
-        {
-            name: "Plastic Bottle",
-            points: 100
-        },
-        {
-            name: "Metal Can",
-            points: 100
-        },
-        {
-            name: "Paper",
-            points: 100
-        },
-        {
-            name: "Glass Bottle",
-            points: 100
-        },
-        {
-            name: "Cardboard",
-            points: 100
-        }
-    ];
 
     // Define all the cards that will be displayed on the dashboard in order
     const cards = [
@@ -186,51 +207,65 @@ function Dashboard() {
                     }}
                 >
                     { /* Map through the leaderboard and display the top 5 users */ }
-                    {leaderboard.slice(0, 5).map((user, index) => (
-                        <Box 
-                            key={index}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                px: 1.25,
-                                borderRadius: 2,
-                                backgroundColor: 'rgba(0,0,0,0.02)'
-                            }}
-                        >
-                            { /* Display the user's rank and change color depending on that */ }
-                            <Avatar 
+                    {leaderboard.length > 0 ? (
+                        leaderboard.slice(0, 5).map((user, index) => (
+                            <Box 
+                                key={index}
                                 sx={{
-                                    width: 44,
-                                    height: 44,
-                                    fontWeight: 800,
-                                    bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'primary.light',
-                                    color: index < 3 ? 'black' : 'primary.dark',
-                                    boxShadow: index < 3 ? 'inset 0 0 0 2px rgba(0,0,0,0.15)' : 'inset 0 0 0 2px rgba(0,0,0,0.05)'
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    px: 1.25,
+                                    borderRadius: 2,
+                                    backgroundColor: 'rgba(0,0,0,0.02)'
                                 }}
                             >
-                                {index + 1}
-                            </Avatar>
+                                { /* Display the user's rank and change color depending on that */ }
+                                <Avatar 
+                                    sx={{
+                                        width: 44,
+                                        height: 44,
+                                        fontWeight: 800,
+                                        bgcolor: index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : index === 2 ? '#CD7F32' : 'primary.light',
+                                        color: index < 3 ? 'black' : 'primary.dark',
+                                        boxShadow: index < 3 ? 'inset 0 0 0 2px rgba(0,0,0,0.15)' : 'inset 0 0 0 2px rgba(0,0,0,0.05)'
+                                    }}
+                                >
+                                    {index + 1}
+                                </Avatar>
 
-                            { /* Display the user's name and points */ }
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
-                                <Typography sx={{ fontWeight: index < 3 ? 700 : 500 }}>
-                                    {user.name}
-                                </Typography>
-                                <Box sx={{ 
-                                    px: 1.25, 
-                                    py: 0.5, 
-                                    borderRadius: 2, 
-                                    bgcolor: 'rgba(0,0,0,0.06)', 
-                                    color: 'text.secondary',
-                                    fontWeight: 700,
-                                    fontSize: '0.9rem'
-                                }}>
-                                    {user.points} pts
+                                { /* Display the user's name and points */ }
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                                    <Typography sx={{ fontWeight: index < 3 ? 700 : 500 }}>
+                                        {user.name || user.username}
+                                    </Typography>
+                                    <Box sx={{ 
+                                        px: 1.25, 
+                                        py: 0.5, 
+                                        borderRadius: 2, 
+                                        bgcolor: 'rgba(0,0,0,0.06)', 
+                                        color: 'text.secondary',
+                                        fontWeight: 700,
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        {user.points} pts
+                                    </Box>
                                 </Box>
                             </Box>
+                        ))
+                    ) : (
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            height: '100%',
+                            color: 'text.secondary'
+                        }}>
+                            <Typography variant="body2" sx={{ textAlign: 'center', fontStyle: 'italic' }}>
+                                No leaderboard data available yet
+                            </Typography>
                         </Box>
-                    ))}
+                    )}
                 </Box>
             ),
             width: 300,
@@ -253,51 +288,65 @@ function Dashboard() {
                     }}
                 >
                     { /* Map through the history and display the last 5 scanned items */ }
-                    {history.slice(0, 5).map((item, index) => (
-                        <Box 
-                            key={index}
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 1.5,
-                                px: 1.25,
-                                borderRadius: 2,
-                                backgroundColor: 'rgba(0,0,0,0.02)'
-                            }}
-                        >
-                            { /* Display the item icon */ }
-                            <Avatar 
+                    {history.length > 0 ? (
+                        history.slice(0, 5).map((item, index) => (
+                            <Box 
+                                key={index}
                                 sx={{
-                                    width: 44,
-                                    height: 44,
-                                    fontWeight: 800,
-                                    bgcolor: 'primary.light',
-                                    color: 'primary.dark',
-                                    boxShadow: 'inset 0 0 0 2px rgba(0,0,0,0.05)'
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 1.5,
+                                    px: 1.25,
+                                    borderRadius: 2,
+                                    backgroundColor: 'rgba(0,0,0,0.02)'
                                 }}
                             >
-                                <Recycling />
-                            </Avatar>
+                                { /* Display the item icon */ }
+                                <Avatar 
+                                    sx={{
+                                        width: 44,
+                                        height: 44,
+                                        fontWeight: 800,
+                                        bgcolor: 'primary.light',
+                                        color: 'primary.dark',
+                                        boxShadow: 'inset 0 0 0 2px rgba(0,0,0,0.05)'
+                                    }}
+                                >
+                                    <Recycling />
+                                </Avatar>
 
-                            { /* Display the item's name and points */ }
-                            <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
-                                <Typography sx={{ fontWeight: 700 }}>
-                                    {item.name}
-                                </Typography>
-                                <Box sx={{ 
-                                    px: 1.25, 
-                                    py: 0.5, 
-                                    borderRadius: 2, 
-                                    bgcolor: 'rgba(0,0,0,0.06)', 
-                                    color: 'text.secondary',
-                                    fontWeight: 700,
-                                    fontSize: '0.9rem'
-                                }}>
-                                    {item.points} pts
+                                { /* Display the item's name and points */ }
+                                <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
+                                    <Typography sx={{ fontWeight: 700 }}>
+                                        {item.name}
+                                    </Typography>
+                                    <Box sx={{ 
+                                        px: 1.25, 
+                                        py: 0.5, 
+                                        borderRadius: 2, 
+                                        bgcolor: 'rgba(0,0,0,0.06)', 
+                                        color: 'text.secondary',
+                                        fontWeight: 700,
+                                        fontSize: '0.9rem'
+                                    }}>
+                                        {item.points} pts
+                                    </Box>
                                 </Box>
                             </Box>
+                        ))
+                    ) : (
+                        <Box sx={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            justifyContent: 'center', 
+                            height: '100%',
+                            color: 'text.secondary'
+                        }}>
+                            <Typography variant="body2" sx={{ textAlign: 'center', fontStyle: 'italic' }}>
+                                No user history available yet
+                            </Typography>
                         </Box>
-                    ))}
+                    )}
                 </Box>
             ),
             width: 300,
