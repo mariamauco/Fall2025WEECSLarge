@@ -48,4 +48,20 @@ router.get('/history/:userId', async (req, res) => {
 
 });
 
+//GET /api/leaderboard: route returns a leaderboard of top 5 users, sorted by points
+router.get('/leaderboard', async (req, res) => {
+  try {
+    const leaderboard = await UserData.find({}) //finds all users in db
+      .sort({ points: -1 }) //sorts by 'points' field in descending order                      
+      .limit(5) //gets top 5 users only
+      .select('name username points -_id'); //only gets name, username, and points field (excludes id)
+
+    res.status(200).json(leaderboard); //returns sorted json array
+
+  } catch (err) {
+    console.error('Error fetching leaderboard:', err);
+    res.status(500).json({ error: 'Error fetching leaderboard data' });
+  }
+});
+
 module.exports = router;
