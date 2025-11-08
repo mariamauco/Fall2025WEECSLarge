@@ -40,7 +40,7 @@ function SignUp() {
     const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
 
     const handleLoginClick = () => {
-        navigate('/login');
+        navigate('/');
     };
 
     const handleSubmit = async () => {
@@ -54,7 +54,7 @@ function SignUp() {
         const name = first + " " + last;
 
         try {
-            const response = await fetch('http://138.197.16.179:5050/api/users/SignUp', {
+            const response = await fetch('http://138.197.16.179:5050/api/users/signup', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ name, username, email, password })

@@ -60,7 +60,7 @@ const handleDetect = async (file) => {
   }
 }
 
-router.post('/api/detect', upload.single('image'), async (req, res) => {
+router.post('/detect', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No image uploaded.');
   }

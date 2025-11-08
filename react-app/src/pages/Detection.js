@@ -68,7 +68,7 @@ function Detection() {
             const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
             // const response = await fetch('http://localhost:5050/api/predict',{ // if running server locally
-            const response = await fetch('http://138.197.16.179:5050/api/predict',{
+            const response = await fetch('http://138.197.16.179:5050/api/predict/detect',{
                 method: 'POST',
                 headers,
                 body: form // passes the image using multer

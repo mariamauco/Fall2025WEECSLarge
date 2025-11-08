@@ -8,21 +8,27 @@ const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
 
-route.get("/userStats")
+// router.get("/userStats")
 
-route.get("/history") //consider deleting if history is inside userStats
+// router.get("/history") //consider deleting if history is inside userStats
 
-router.post("/Login", async (req, res) => {
+router.post("/login", async (req, res) => {
   try{
     const { email, password } = req.body;
-    //find user by email
-    const user = await UserData.findOne({ email });
+    //find user by email or username
+    const identifier = (req.body.email || req.body.username || '').trim().toLowerCase();
+    const user = await UserData.findOne({
+      $or: [
+        { email: identifier },
+        { username: identifier }
+      ]
+    });
     if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-    // Compare passwords
-    // implement hashing later
-    //const isMatch = await bcrypt.compare(password, user.password); 
-    const isMatch = password === user.password;
+    // Compare passwords with hashing
+    const isMatch = await bcrypt.compare(password, user.password); 
+    //const isMatch = password === user.password;
+
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
     //create a token if email and pass are correct
     const token = jwt.sign(
@@ -48,11 +54,11 @@ router.post("/Login", async (req, res) => {
 
 
 //register/signing up user
-router.post("/SignUp", async (req,res) =>{
+router.post("/signup", async (req,res) =>{
     //API 
     try{
         const{name, username, email, password} = req.body;
-        if(!name || !username || !email || !password){ //fixed typo
+        if(!name || !username || !email || !password){ 
             return res.status(400).json({error:"All fields required"});
         }
         //check if user exists (username)
@@ -66,12 +72,15 @@ router.post("/SignUp", async (req,res) =>{
             return res.status(400).json({error:"Email already linked to an account"});
         }
 
+        //hash password, 11 salt rounds
+        const hashPassword = await bcrypt.hash(password,11);
+
         //create user: look how to link to schema:
         const newUser = {
             name,
             username,
             email,
-            password
+            hashPassword
         };
         const result = await UserData.create(newUser);
 

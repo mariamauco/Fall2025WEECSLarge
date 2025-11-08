@@ -1,3 +1,4 @@
+
 import * as React from 'react';
 import {Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment} from '@mui/material';
 import { Email, Lock } from '@mui/icons-material';
@@ -43,7 +44,7 @@ function Login() {
             const response = await fetch('http://138.197.16.179:5050/api/users/login', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username, email, password })
+                body: JSON.stringify({ email, password })
             });
             
             const data = await response.json();
