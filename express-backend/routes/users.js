@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken"); //provides secure login token
 const UserData = require("../models/user.js"); //path to schema file
 const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
-const JWT_SECRET = config.env.JWT_SECRET //jwt secret key
+const JWT_SECRET = process.env.JWT_SECRET; //jwt secret key
 
 // router.get("/userStats")
 
