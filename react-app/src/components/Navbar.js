@@ -1,9 +1,11 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, Button } from '@mui/material';
 import { Home, Login } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -14,6 +16,29 @@ function Navbar() {
     const handleSignUpClick = () => {
         navigate('/signup');
     };
+
+    // get most updated token
+    useEffect(() => {
+        const checkAuth = () => {
+            setIsLoggedIn(!!localStorage.getItem('token'));
+        };
+        checkAuth();
+
+        // react to token changes from other tabs/windows
+        const onStorage = (e) => {
+            if (e.key === 'token') checkAuth();
+        };
+        window.addEventListener('storage', onStorage);
+        return () => {
+            window.removeEventListener('storage', onStorage);
+        };
+    }, [location]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        navigate('/');
+    }
 
     return (
         <Box
@@ -94,6 +119,30 @@ function Navbar() {
                 >
                     Start Sorting
                 </Button>
+                {isLoggedIn ? (
+                    <Button
+                        onClick={handleLogout}
+                        variant="contained"
+                        sx={{
+                            backgroundColor: 'secondary.main',
+                            color: 'white',
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '0.95rem',
+                            px: 3,
+                            py: 1,
+                            borderRadius: '20px',
+                            '&:hover': {
+                                backgroundColor: 'secondary.dark',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(196, 211, 153, 0.3)'
+                            },
+                            transition: 'all 0.2s ease-in-out'
+                        }}
+                    >
+                        Logout
+                    </Button>
+                ) :(<></>)}
             </Box>
         </Box>
     );

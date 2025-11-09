@@ -6,14 +6,34 @@ const jwt = require("jsonwebtoken"); //provides secure login token
 const UserData = require("../models/user.js"); //path to schema file
 const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
-//const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
+const JWT_SECRET = config.env.JWT_SECRET //jwt secret key
 
 // router.get("/userStats")
 
 // router.get("/history") //consider deleting if history is inside userStats
 
+router.post("/jwt", async (req,res) =>{
+  const tokenHeaderKey = 'jwt-token';
+  const token = req.headers[tokenHeaderKey];
+  try {
+    const verified = null;
+    if (token)
+      verified = jwt.verify(token, jwtSecretKey);
+    if (verified) {
+      return res.status(200).json({ message: 'success' });
+    } else {
+      // Access Denied
+      return res.status(401).json({ message: 'error' });
+    }
+  } catch (error) {
+    // Access Denied
+    return res.status(401).json({ message: 'error' });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try{
+    const jwtSecret = JWT_SECRET;
     const { email, password } = req.body;
     //find user by email or username
     const identifier = (req.body.email || req.body.username || '').trim().toLowerCase();
@@ -32,10 +52,10 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
     //create a token if email and pass are correct
     const token = jwt.sign(
-      { id: user._id, username: user.username },
-      "secret key from .env", //need to change to a env. variable
-      { expiresIn: "1h" }
-    );
+      { id: user._id, username: user.username,
+        expiresIn: "1h" }
+    , jwtSecret);
+
     //send response to frontend
     res.json({
       message: "Login successful!",
@@ -44,7 +64,8 @@ router.post("/login", async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        points: user.points
+        points: user.points,
+        token: token
       }
     });
   } catch (err) {

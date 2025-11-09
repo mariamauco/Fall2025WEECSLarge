@@ -37,6 +37,7 @@ function Dashboard() {
     const [leaderboard, setLeaderboard] = useState([]);
     const [history, setHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [token, setToken] = useState(null);
 
     const handleDetectionClick = () => {
         navigate('/detection');
@@ -51,6 +52,8 @@ function Dashboard() {
                 const storedToken = localStorage.getItem('token');
                 
                 if (storedUser) {
+                    // set token state from the stored token
+                    setToken(storedToken);
                     const user = JSON.parse(storedUser);
                     const userId = user.id || user._id;
                     
@@ -353,6 +356,16 @@ function Dashboard() {
             height: 450
         }
     ];
+
+    if (!token) {
+        return (
+        <>
+            <main style={{ padding: '50px' }}>
+            <p>You&apos;re not logged in.</p>
+            </main>
+        </>
+        )
+    }
     
     return (
         <ThemeProvider theme={theme}>

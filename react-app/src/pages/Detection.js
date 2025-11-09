@@ -31,6 +31,22 @@ function Detection() {
     const [uploadError, setUploadError] = useState(null);
     const [selectedFile, setSelectedFile] = useState(null);
     const [previewUrl, setPreviewUrl] = useState(null);
+    const [token, setToken] = useState(null);
+    const [userName, setUserName] = useState("Guest");
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const storedToken = localStorage.getItem('token');
+                if(storedToken){
+                    setToken(storedToken);
+                }
+            } catch (error) {
+                console.error('Error fetching user data:', error);
+            }
+        };
+        fetchUserData();
+    }, []);
 
     const handleUploadClick = () => {
         fileInputRef.current?.click();
@@ -98,6 +114,17 @@ function Detection() {
     };
 
     // NEXT TO IMPLEMENT: DISPLAY THE RESPONSE
+
+
+    if (!token) {
+        return (
+        <>
+            <main style={{ padding: '50px' }}>
+            <p>You&apos;re not logged in.</p>
+            </main>
+        </>
+        )
+    }
 
     return (
         <ThemeProvider theme={theme}>
