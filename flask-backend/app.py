@@ -1,6 +1,7 @@
 from flask import Flask, request, Response, jsonify, stream_with_context
 from ultralytics import YOLO
 from PIL import Image
+import base64
 import io
 
 app = Flask(__name__)
@@ -62,15 +63,25 @@ def predict_route():
         return jsonify({'prediction': [], 'error': 'no image provided'}), 400
     # run the predict function and store response in preds
     try:
-        detections, buf = predict(image_bytes, return_image=True)
+        detections, buf = predict(image_bytes, return_image=False)
 
-        if buf:  # If an image was generated
-            from flask import send_file
-            return send_file(
-                buf,
-                mimetype="image/jpeg",
-                as_attachment=False
-            )
+    # Count detections by class name
+    material_counts = {}
+    for d in detections:
+        name = d["class_name"]
+        material_counts[name] = material_counts.get(name, 0) + 1
+
+    return jsonify({
+        "detections": detections,
+        "counts": material_counts
+    })
+
+    except Exception as e:
+        return jsonify({
+            "detections": [],
+            "error": f"model error: {str(e)}"
+        }), 500
+
         else:
             return jsonify({"detections": detections})
     except Exception as e:
