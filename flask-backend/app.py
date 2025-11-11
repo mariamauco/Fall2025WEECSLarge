@@ -64,29 +64,22 @@ def predict_route():
     # run the predict function and store response in preds
     try:
         detections, buf = predict(image_bytes, return_image=False)
+        # Count detections by class name
+        material_counts = {}
+        for d in detections:
+            name = d["class_name"]
+            material_counts[name] = material_counts.get(name, 0) + 1
 
-    # Count detections by class name
-    material_counts = {}
-    for d in detections:
-        name = d["class_name"]
-        material_counts[name] = material_counts.get(name, 0) + 1
-
-    return jsonify({
-        "detections": detections,
-        "counts": material_counts
-    })
+        return jsonify({
+            "detections": detections,
+            "counts": material_counts
+        })
 
     except Exception as e:
         return jsonify({
             "detections": [],
             "error": f"model error: {str(e)}"
         }), 500
-
-        else:
-            return jsonify({"detections": detections})
-    except Exception as e:
-        # Return error message on model fail
-        return jsonify({'detections': [], 'error': f'model error: {str(e)}'}), 500
 
 
 if __name__ == '__main__':
