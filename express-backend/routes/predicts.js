@@ -36,7 +36,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // sends the image user uploaded to the flask server for detection
-const fs = require('fs');
 const FormData = require('form-data'); // to install: npm install form-data
 const fetch = require('node-fetch'); // to install: npm install form-data node-fetch@2
 
