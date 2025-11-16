@@ -15,9 +15,18 @@ const db = require("../db/connection.js");
 
 
 // Configure Multer for file storage
+const fs = require('fs');
+
+// Use an absolute uploads path relative to the project root
+const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+// Ensure the directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, 'uploads/'); // Directory to save uploaded images
+      cb(null, UPLOAD_DIR); // absolute directory to save uploaded images
   },
   filename: function (req, file, cb) {
       cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
@@ -36,7 +45,8 @@ const handleDetect = async (file) => {
     // send the actual file as multipart/form-data to the flask server
     const form = new FormData();
     // multer sets file.path relative to project (e.g. 'uploads/xxxx'), make absolute
-    const filePath = path.join(__dirname, file.path);
+    // file.path will now be absolute because we set UPLOAD_DIR above
+    const filePath = file.path;
     form.append('image', fs.createReadStream(filePath));
     form.append('filename', file.filename);
 
@@ -61,6 +71,7 @@ const handleDetect = async (file) => {
 }
 
 router.post('/detect', upload.single('image'), async (req, res) => {
+  console.log('Upload request, req.file =', req.file);
   if (!req.file) {
     return res.status(400).send('No image uploaded.');
   }
