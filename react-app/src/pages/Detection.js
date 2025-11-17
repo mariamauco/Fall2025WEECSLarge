@@ -117,14 +117,16 @@ function Detection() {
                 maxWidth={false}
                 disableGutters
                 sx={{
-                    height: '100vh',
+                    minHeight: '100vh',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '100vw',
                     background: 'linear-gradient(135deg, #D4BFED 0%, #FCD5E5 50%, #E5EEC8 100%)',
-                    padding: 0,
+                    paddingTop: '90px',
+                    paddingBottom: '40px',
+                    paddingX: 0,
                     margin: 0,
                     gap: 4
                 }}
