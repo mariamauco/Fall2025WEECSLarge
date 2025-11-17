@@ -69,7 +69,7 @@ function Navbar() {
                         fontSize: '1.5rem'
                     }}
                 >
-                    ♻️ Waste Sorter
+                    ♻️ Ecosorter
                 </Typography>
             </Box>
 

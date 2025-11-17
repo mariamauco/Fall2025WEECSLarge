@@ -81,7 +81,7 @@ function Landing() {
                                 color: 'secondary.dark'
                             }}
                         >
-                            Waste Sorter
+                            Ecosorter
                         </Typography>
                         <Typography
                             variant="h6"
