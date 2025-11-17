@@ -129,7 +129,7 @@ function Dashboard() {
         },
         // CO2 Saved card
         {
-            title: "CO2 Saved",
+            title: "CO₂ Saved",
             icon: <Air />,
             backgroundColor: "white",
             titleColor: "secondary.dark",
