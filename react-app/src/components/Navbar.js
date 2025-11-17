@@ -1,18 +1,37 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, Button } from '@mui/material';
-import { Home, Login } from '@mui/icons-material';
+import { Home, Login, Logout } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
     const navigate = useNavigate();
     const location = useLocation();
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    // Check if user is logged in
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        setIsLoggedIn(!!(token && user));
+    }, [location.pathname]); // Re-check when route changes
 
     const handleHomeClick = () => {
-        navigate('/');
+        if (isLoggedIn) {
+            navigate('/dashboard');
+        } else {
+            navigate('/');
+        }
     };
 
-    const handleSignUpClick = () => {
-        navigate('/signup');
+    const handleLoginClick = () => {
+        navigate('/login');
+    };
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        setIsLoggedIn(false);
+        navigate('/');
     };
 
     return (
@@ -56,44 +75,74 @@ function Navbar() {
 
             {/* Navigation Links */}
             <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
-                {/* Home Button */}
-                <IconButton
-                    onClick={handleHomeClick}
-                    sx={{
-                        color: location.pathname === '/' ? 'primary.main' : 'text.secondary',
-                        backgroundColor: location.pathname === '/' ? 'rgba(196, 211, 153, 0.1)' : 'transparent',
-                        '&:hover': {
-                            backgroundColor: 'rgba(196, 211, 153, 0.1)',
-                            color: 'primary.main'
-                        }
-                    }}
-                >
-                    <Home />
-                </IconButton>
+                {/* Home Button - only show if logged in */}
+                {isLoggedIn && (
+                    <IconButton
+                        onClick={handleHomeClick}
+                        sx={{
+                            color: location.pathname === '/dashboard' ? 'primary.main' : 'text.secondary',
+                            backgroundColor: location.pathname === '/dashboard' ? 'rgba(196, 211, 153, 0.1)' : 'transparent',
+                            '&:hover': {
+                                backgroundColor: 'rgba(196, 211, 153, 0.1)',
+                                color: 'primary.main'
+                            }
+                        }}
+                    >
+                        <Home />
+                    </IconButton>
+                )}
 
-                {/* Start Sorting Button */}
-                <Button
-                    onClick={handleSignUpClick}
-                    variant="contained"
-                    sx={{
-                        backgroundColor: 'primary.main',
-                        color: 'white',
-                        textTransform: 'none',
-                        fontWeight: 'bold',
-                        fontSize: '0.95rem',
-                        px: 3,
-                        py: 1,
-                        borderRadius: '20px',
-                        '&:hover': {
-                            backgroundColor: 'primary.dark',
-                            transform: 'translateY(-1px)',
-                            boxShadow: '0 4px 12px rgba(196, 211, 153, 0.3)'
-                        },
-                        transition: 'all 0.2s ease-in-out'
-                    }}
-                >
-                    Start Sorting
-                </Button>
+                {/* Show Logout button if logged in, otherwise show Start Sorting */}
+                {isLoggedIn ? (
+                    <Button
+                        onClick={handleLogout}
+                        variant="outlined"
+                        startIcon={<Logout />}
+                        sx={{
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '0.95rem',
+                            px: 3,
+                            py: 1,
+                            borderRadius: '20px',
+                            '&:hover': {
+                                borderColor: 'primary.dark',
+                                backgroundColor: 'rgba(196, 211, 153, 0.1)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(196, 211, 153, 0.3)'
+                            },
+                            transition: 'all 0.2s ease-in-out'
+                        }}
+                    >
+                        Logout
+                    </Button>
+                ) : (
+                    <Button
+                        onClick={handleLoginClick}
+                        variant="outlined"
+                        sx={{
+                            borderColor: 'primary.main',
+                            color: 'primary.main',
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '0.95rem',
+                            px: 3,
+                            py: 1,
+                            borderRadius: '20px',
+                            '&:hover': {
+                                borderColor: 'primary.dark',
+                                backgroundColor: 'rgba(196, 211, 153, 0.1)',
+                                transform: 'translateY(-1px)',
+                                boxShadow: '0 4px 12px rgba(196, 211, 153, 0.3)'
+                            },
+                            transition: 'all 0.2s ease-in-out'
+                        }}
+                    >
+                        Login
+                    </Button>
+                )}
             </Box>
         </Box>
     );
