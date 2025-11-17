@@ -92,11 +92,29 @@ router.post('/detect', upload.single('image'), async (req, res) => {
 
   // call detection service and wait for result
   const prediction = await handleDetect(req.file);
-  if (!prediction || !prediction.prediction) {
+  if (!prediction) {
     console.error('No prediction returned for file:', req.file.filename, 'response:', prediction);
     return res.status(500).json({ error: 'Prediction failed' });
   }
-  const cat = prediction.prediction;
+
+  // Normalize the expected response shape from the Flask server.
+  // Expected shape: { annotated_image, counts, detections, top_category }
+  const detectionsFromFlask = Array.isArray(prediction.detections) ? prediction.detections : [];
+  const countsFromFlask = prediction.counts || {};
+  const topCategory = prediction.top_category || null;
+
+  // Choose category to store: prefer top_category.label, then the highest-count key, then first detection class_name
+  let cat = null;
+  if (topCategory && topCategory.label) {
+    cat = topCategory.label;
+  } else if (Object.keys(countsFromFlask).length > 0) {
+    // pick the key with the highest count
+    cat = Object.keys(countsFromFlask).reduce((a, b) => countsFromFlask[a] >= countsFromFlask[b] ? a : b);
+  } else if (detectionsFromFlask.length > 0 && detectionsFromFlask[0].class_name) {
+    cat = detectionsFromFlask[0].class_name;
+  } else {
+    cat = 'unknown';
+  }
 
   const newDetection = new DetectionData({
     userID: user._id,
@@ -117,7 +135,8 @@ router.post('/detect', upload.single('image'), async (req, res) => {
   // fetch detection environmental info
   let info;
   try {
-    info = await Category.findOne({ catName: cat });
+    // use case-insensitive match for category name to be more robust
+    info = await Category.findOne({ catName: { $regex: new RegExp(`^${cat}$`, 'i') } });
     if (!info) {
       return res.status(404).json({ error: "No environmental info found." });
     }
