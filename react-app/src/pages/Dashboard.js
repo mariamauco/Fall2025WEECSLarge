@@ -303,7 +303,7 @@ function Dashboard() {
                                 { /* Display the item's name and points */ }
                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flex: 1 }}>
                                     <Typography sx={{ fontWeight: 700 }}>
-                                        {item.name}
+                                        {item.category}
                                     </Typography>
                                     <Box sx={{ 
                                         px: 1.25, 
