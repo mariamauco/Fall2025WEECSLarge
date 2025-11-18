@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRef, useState, useEffect } from "react";
 import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography } from "@mui/material";
-import { Air, EmojiEvents, CheckCircle, Cancel } from '@mui/icons-material';
+import { Air, EmojiEvents, CheckCircle, Cancel, SignalCellularNullTwoTone } from '@mui/icons-material';
 import wasteImage from "../assets/waste_placeholder.jpg";
 
 let theme = createTheme({});
@@ -28,18 +28,26 @@ function Detection() {
     const [message, setMessage] = useState(null);
     const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
     
-    // Mock data for testing
+    // detection info to display
     const [predictionResponse, setPredictionResponse] = useState({
-        message: "Detection successful",
+        message: '',
         info: {
-            catName: "Plastic Bottle",
-            co2: 2.5,
-            recyclable: true, // true for recycle, false for trash
+            catName: '',
+            desc: '',
+            disposalInfo: '',
+            co2: null,
+            energy: null,
+            water: null
         },
         detect: {
-            quantity: 1
+            quantity: 0
         },
-        points: 10
+        prediction: {
+            annotated_image: null,
+            top_category: {
+                confidence: null
+            }
+        }
     });
 
     const [uploadError, setUploadError] = useState(null);
@@ -47,6 +55,7 @@ function Detection() {
     const [previewUrl, setPreviewUrl] = useState(null);
     const [token, setToken] = useState(null);
     const [userName, setUserName] = useState("Guest");
+    const [detection, setDetection] = useState(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -104,21 +113,48 @@ function Detection() {
                 body: form // passes the image using multer
             });
 
-            const data = await response.json();
-            // IF SUCESSFUL THIS RETURNS: 
-            //    return res.status(200).json({
-            //    message: "Detection successful",
-            //    info: infoData, // this is the disposal and savings info (follows schema)
-            //    detect: detectionData, // this is the detection (follows schema)
-            //    filename: req.file.filename,
-            //    prediction
-            //  });
+            if(response.ok){
+                const data = await response.json();
+                // data shape: { message, info, detect, filename, prediction }
+                setDetection(data.detect || null);
 
-            // IMPLEMENT REST OF HANDLESUBMIT
+                // Normalize predictionResponse for UI
+                const pred = data.prediction || {};
+                const thisPrediction = {
+                    message: data.message || '',
+                    info: data.info || predictionResponse.info,
+                    detect: data.detect || predictionResponse.detect,
+                    prediction: {
+                        annotated_image: pred.annotated_image || pred.annotatedImage || null,
+                        counts: pred.counts || {},
+                        detections: Array.isArray(pred.detections) ? pred.detections : (pred.predictions || []),
+                        top_category: pred.top_category || pred.topCategory || null
+                    }
+                };
 
-            // handle if response is not ok
+                setPredictionResponse(thisPrediction);
 
-            // handle if response is ok: save the full response to display in the UI
+                // If server returned an annotated image, show it in place of the preview
+                if (thisPrediction.prediction.annotated_image) {
+                    // revoke old object URL if it was created
+                    if (previewUrl && previewUrl.startsWith('blob:')) {
+                        URL.revokeObjectURL(previewUrl);
+                    }
+                    setPreviewUrl(thisPrediction.prediction.annotated_image);
+                }
+
+                setMessage('Detection saved');
+                setMessageType('success');
+            }
+            else{
+                setDetection(null);
+                setPredictionResponse(null);
+                setMessage('Detection failed');
+                setMessageType('error');
+            }
+
+            
+           
 
         }catch(error){
                 console.error('Upload error', error);
@@ -347,7 +383,7 @@ function Detection() {
                     }}
                 >
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {predictionResponse.info.recyclable ? (
+                        {predictionResponse.info.catName !== "Trash" ? (
                             <>
                                 {/* Item Name */}
                                 <Typography
@@ -361,6 +397,20 @@ function Detection() {
                                 >
                                     {predictionResponse.info.catName || 'Recyclable Item'}
                                 </Typography>
+
+                                {/* Top category and counts */}
+                                {predictionResponse.prediction?.top_category?.label && (
+                                    <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mb: 1 }}>
+                                        Top: {predictionResponse.prediction.top_category.label} ({(predictionResponse.prediction.top_category.confidence || 0).toFixed(2)})
+                                    </Typography>
+                                )}
+                                {predictionResponse.prediction?.counts && Object.keys(predictionResponse.prediction.counts).length > 0 && (
+                                    <Box sx={{ textAlign: 'center', color: 'text.secondary', mb: 1 }}>
+                                        {Object.entries(predictionResponse.prediction.counts).map(([k,v]) => (
+                                            <Typography key={k} variant="caption" sx={{ display: 'block' }}>{k}: {v}</Typography>
+                                        ))}
+                                    </Box>
+                                )}
 
                                 {/* Recycle Indicator */}
                                 <Box

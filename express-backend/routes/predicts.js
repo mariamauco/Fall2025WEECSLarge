@@ -173,11 +173,11 @@ router.post('/detect', upload.single('image'), async (req, res) => {
   }
 
   // fetch detection environmental info
-  let info;
+  let catInfo;
   try {
     // use case-insensitive match for category name to be more robust
-    info = await Category.findOne({ catName: { $regex: new RegExp(`^${cat}$`, 'i') } });
-    if (!info) {
+    catInfo = await Category.findOne({ catName: { $regex: new RegExp(`^${cat}$`, 'i') } });
+    if (!catInfo) {
       return res.status(404).json({ error: "No environmental info found." });
     }
   } catch (error) {
@@ -185,16 +185,30 @@ router.post('/detect', upload.single('image'), async (req, res) => {
     return res.status(500).json({ error: 'Database error' });
   }
 
-  const infoData = typeof info.toObject === 'function' ? info.toObject() : info;
+  const infoData = typeof catInfo.toObject === 'function' ? catInfo.toObject() : catInfo;
   const detectionData = typeof newDetection.toObject === 'function' ? newDetection.toObject() : newDetection;
+
+  // Build response constants (use detectionData and the Flask response)
+  const message = "Detection successful";
+  const info = infoData;
+  const detect = detectionData;
+  const filename = req.file.filename;
+
+  // Normalize prediction object coming from Flask
+  const predictionResponse = {
+    annotated_image: prediction.annotated_image || prediction.annotatedImage || null,
+    counts: prediction.counts || {},
+    detections: Array.isArray(prediction.detections) ? prediction.detections : (prediction.predictions || []),
+    top_category: prediction.top_category || prediction.topCategory || null
+  };
 
   // return all info packaged to the frontend
   return res.status(200).json({
-    message: "Detection successful",
-    info: infoData,
-    detect: detectionData,
-    filename: req.file.filename,
-    prediction
+    message,
+    info,
+    detect,
+    filename,
+    prediction: predictionResponse
   });
 
 });
