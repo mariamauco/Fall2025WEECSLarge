@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRef, useState, useEffect } from "react";
-import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography, CircularProgress, Backdrop } from "@mui/material";
+import { Link, Box, Paper, Button, Container, createTheme, ThemeProvider, Typography, CircularProgress, Backdrop } from "@mui/material";
 import { Air, EmojiEvents, CheckCircle, Cancel, SignalCellularNullTwoTone } from '@mui/icons-material';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import EnergySavingsLeafIcon from '@mui/icons-material/EnergySavingsLeaf';
@@ -506,14 +506,15 @@ function Detection() {
                                             </Typography>
 
                                             {Array.isArray(predictionResponse.info.links) && predictionResponse.info.links.length > 0 && (
-                                                <Box sx={{ width: '100%', textAlign: 'left', mt: 1 }}>
+                                                <Box sx={{ width: '100%', textAlign: 'left', mt: 1, direction: 'flex'}}>
                                                     <Typography variant="subtitle2" sx={{ color: theme.palette.primary.dark, mb: 0.5 }}>
                                                         Some helpful links to learn more:
                                                     </Typography>
                                                     {predictionResponse.info.links.map((link, idx) => (
-                                                        <Typography key={idx} variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-word' }}>
-                                                            {link}
-                                                        </Typography>
+                                                        <Link key={idx} variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-word' }}>
+                                                            - {link}
+                                                            <div></div>
+                                                        </Link>
                                                     ))}
                                                 </Box>
                                             )}
