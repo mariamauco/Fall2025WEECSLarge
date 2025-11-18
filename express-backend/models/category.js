@@ -7,7 +7,7 @@ const CategorySchema = new mongoose.Schema({
     co2: Number,
     energy: Number,
     water: Number,
-    links: {type: String}
+    links: [{type: String}]
 })
 //compile model from schema
 const CategoryData = mongoose.model("Category", CategorySchema, "categories");

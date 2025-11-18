@@ -37,7 +37,7 @@ function Detection() {
             catName: '',
             desc: '',
             disposalInfo: '',
-            links: '',
+            links: [],
             co2: null,
             energy: null,
             water: null
@@ -447,18 +447,24 @@ function Detection() {
                                             </Typography>
                                         </Box>
                                         {/* Disposal Information */}
-                                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
-                                            {predictionResponse.info.disposalInfo}
-                                        </Typography>
-                                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
-                                            Some helpful links to learn more:
-                                            {predictionResponse.info.links}
-                                        </Typography>
-                                    </Box>
-                                )}
-                                
+                                            <Typography variant="body1" sx={{ color: 'dimgray', mb: 1 }}>
+                                                {predictionResponse.info.disposalInfo}
+                                            </Typography>
 
-                                {/* Stats Grid (CO2 and Points) */}
+                                            {Array.isArray(predictionResponse.info.links) && predictionResponse.info.links.length > 0 && (
+                                                <Box sx={{ width: '100%', textAlign: 'left', mt: 1 }}>
+                                                    <Typography variant="subtitle2" sx={{ color: theme.palette.primary.dark, mb: 0.5 }}>
+                                                        Some helpful links to learn more:
+                                                    </Typography>
+                                                    {predictionResponse.info.links.map((link, idx) => (
+                                                        <Typography key={idx} variant="body2" sx={{ color: 'text.secondary', wordBreak: 'break-word' }}>
+                                                            {link}
+                                                        </Typography>
+                                                    ))}
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    )}
                                 <Box
                                     sx={{
                                         display: 'grid',
