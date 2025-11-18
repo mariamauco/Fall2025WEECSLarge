@@ -37,27 +37,43 @@ function App() {
 
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    setToken(token)
-    if (!token) {
+    const myToken = localStorage.getItem('token');
+    setToken(myToken)
+    if (!myToken) {
         // No token: not authenticated
         setUser(null);
         return;
     }
-    try{
-      fetch('http://138.197.16.179:5050/api/users/jwt', {
-        headers: {
-          'jwt-token': token,
-        },
-      })
-      .then((res) => res.json())
-    }catch (err) {
-        // network / server error — treat as not authenticated for now
+
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('http://138.197.16.179:5050/api/users/jwt', {
+          headers: {
+            'jwt-token': myToken,
+          },
+        });
+        if (!res.ok) {
+          // unauthorized or other error
+          localStorage.removeItem('token');
+          setToken(null);
+          setUser(null);
+          return;
+        }
+        const data = await res.json();
+        if (data && data.message === 'success') {
+          setUser({ authenticated: true });
+        } else {
+          setUser(null);
+        }
+      } catch (err) {
         console.error('Auth failed', err);
         setToken(null);
         setUser(null);
       }
-  })
+    };
+
+    checkAuth();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>

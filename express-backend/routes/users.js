@@ -8,17 +8,14 @@ const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 const JWT_SECRET = process.env.JWT_SECRET; //jwt secret key
 
-// router.get("/userStats")
-
-// router.get("/history") //consider deleting if history is inside userStats
-
 router.get("/jwt", async (req,res) =>{
   const tokenHeaderKey = 'jwt-token';
   const token = req.headers[tokenHeaderKey];
   try {
-    const verified = null;
-    if (token)
+    let verified = null;
+    if (token) {
       verified = jwt.verify(token, JWT_SECRET);
+    }
     if (verified) {
       return res.status(200).json({ message: 'success' });
     } else {
@@ -52,9 +49,10 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
     //create a token if email and pass are correct
     const token = jwt.sign(
-      { id: user._id, username: user.username,
-        expiresIn: "1h" }
-    , jwtSecret);
+      { id: user._id, username: user.username },
+      jwtSecret,
+      { expiresIn: '1h' }
+    );
 
     //send response to frontend
     res.json({
