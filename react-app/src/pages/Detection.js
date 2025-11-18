@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRef, useState, useEffect } from "react";
 import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography, CircularProgress, Backdrop } from "@mui/material";
-import { Air, EmojiEvents, CheckCircle, Cancel, SignalCellularNullTwoTone } from '@mui/icons-material';
+import { Air, EmojiEvents, CheckCircle, Error } from '@mui/icons-material';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import EnergySavingsLeafIcon from '@mui/icons-material/EnergySavingsLeaf';
 import wasteImage from "../assets/waste_placeholder.jpg";
@@ -61,6 +61,7 @@ function Detection() {
     const [userName, setUserName] = useState("Guest");
     const [detection, setDetection] = useState(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [showResults, setShowResults] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -88,6 +89,30 @@ function Detection() {
             // create a preview URL for the selected file
             const url = URL.createObjectURL(file);
             setPreviewUrl(url);
+            // Hide results when a new image is uploaded
+            setShowResults(false);
+            setPredictionResponse({
+                message: '',
+                info: {
+                    catName: '',
+                    desc: '',
+                    disposalInfo: '',
+                    links: [],
+                    co2: null,
+                    energy: null,
+                    water: null
+                },
+                detect: {
+                    quantity: 0,
+                    points: 0
+                },
+                prediction: {
+                    annotated_image: null,
+                    top_category: {
+                        confidence: null
+                    }
+                }
+            });
         } else {
             setSelectedFile(null);
             setPreviewUrl(null);
@@ -154,12 +179,14 @@ function Detection() {
 
                 setMessage('Detection saved');
                 setMessageType('success');
+                setShowResults(true);
             }
             else{
                 setDetection(null);
                 setPredictionResponse(null);
                 setMessage('Detection failed');
                 setMessageType('error');
+                setShowResults(false);
             }
 
             
@@ -171,6 +198,7 @@ function Detection() {
                 setPredictionResponse(null);
                 setMessage('Network error occurred');
                 setMessageType('error');
+                setShowResults(false);
         } finally {
             setIsLoading(false);
         }
@@ -248,12 +276,6 @@ function Detection() {
                     This may take a few seconds
                 </Typography>
             </Backdrop>
-
-            {message && (
-                <Typography sx={{ color: messageType === 'error' ? 'red' : 'green', mb: 2 }}>
-                    {message}
-                </Typography>
-            )}
 
             {/* Camera Box */}
             <Paper
@@ -415,7 +437,7 @@ function Detection() {
                             color: "#ccc"
                         }
                     }}>
-                    {isLoading ? 'Detecting...' : 'Submit'}
+                    Submit
                 </Button>
 
                 {/* File input */}
@@ -429,6 +451,7 @@ function Detection() {
             </Box>
 
             {/* Stats Card */}
+            {showResults && (
             <Paper
                     elevation={3}
                     sx={{
@@ -441,7 +464,40 @@ function Detection() {
                     }}
                 >
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                        {predictionResponse.info.catName !== "Trash" ? (
+                        {predictionResponse && predictionResponse.info && (predictionResponse.info.catName === "Unknown" || !predictionResponse.info.disposalInfo) ? (
+                            <>
+                                {/* Unknown/Error Title */}
+                                <Typography
+                                    variant="h5"
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        color: theme.palette.primary.dark,
+                                        textAlign: 'center',
+                                        mb: 1
+                                    }}
+                                >
+                                    {predictionResponse.info.catName || 'Unknown Item'}
+                                </Typography>
+
+                                {/* Error Indicator */}
+                                <Box
+                                    sx={{
+                                        backgroundColor: theme.palette.secondary.light,
+                                        borderRadius: 2,
+                                        padding: 2,
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        gap: 1.5
+                                    }}
+                                >
+                                    <Error sx={{ fontSize: 32, color: theme.palette.secondary.dark }} />
+                                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.secondary.dark }}>
+                                        Unable to Identify
+                                    </Typography>
+                                </Box>
+                            </>
+                        ) : (
                             <>
                                 {/* Item Name */}
                                 <Typography
@@ -578,42 +634,10 @@ function Detection() {
                                     )}
                                 </Box>
                             </>
-                        ) : (
-                            <>
-                                {/* Trash Title */}
-                                <Typography
-                                    variant="h5"
-                                    sx={{
-                                        fontWeight: 'bold',
-                                        color: theme.palette.primary.dark,
-                                        textAlign: 'center',
-                                        mb: 1
-                                    }}
-                                >
-                                    Trash
-                                </Typography>
-
-                                {/* Trash Indicator */}
-                                <Box
-                                    sx={{
-                                        backgroundColor: theme.palette.secondary.light,
-                                        borderRadius: 2,
-                                        padding: 2,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: 1.5
-                                    }}
-                                >
-                                    <Cancel sx={{ fontSize: 32, color: theme.palette.secondary.dark }} />
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.secondary.dark }}>
-                                        Throw Away
-                                    </Typography>
-                                </Box>
-                            </>
                         )}
                     </Box>
                 </Paper>
+            )}
             </Container>
         </ThemeProvider>
     );
