@@ -2,6 +2,8 @@ import * as React from 'react';
 import { useRef, useState, useEffect } from "react";
 import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography } from "@mui/material";
 import { Air, EmojiEvents, CheckCircle, Cancel, SignalCellularNullTwoTone } from '@mui/icons-material';
+import WaterDropIcon from '@mui/icons-material/WaterDrop';
+import EnergySavingsLeafIcon from '@mui/icons-material/EnergySavingsLeaf';
 import wasteImage from "../assets/waste_placeholder.jpg";
 
 let theme = createTheme({});
@@ -40,7 +42,8 @@ function Detection() {
             water: null
         },
         detect: {
-            quantity: 0
+            quantity: 0,
+            points: 0
         },
         prediction: {
             annotated_image: null,
@@ -449,6 +452,30 @@ function Detection() {
                                             </Typography>
                                             <Typography variant="caption" sx={{ color: 'darkgray' }}>
                                                 CO₂ (lbs)
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {/* Energy Saved */}
+                                    {predictionResponse.info.energy !== undefined && (
+                                        <Box sx={{ textAlign: 'center' }}>
+                                            <EnergySavingsLeafIcon sx={{ fontSize: 32, color: theme.palette.primary.dark, mb: 0.5 }} />
+                                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
+                                                {(predictionResponse.info.energy * (predictionResponse.detect?.quantity || 1)).toFixed(1)}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: 'darkgray' }}>
+                                                Energy (kWh)
+                                            </Typography>
+                                        </Box>
+                                    )}
+                                    {/* Water Saved */}
+                                    {predictionResponse.info.water !== undefined && (
+                                        <Box sx={{ textAlign: 'center' }}>
+                                            <WaterDropIcon sx={{ fontSize: 32, color: theme.palette.primary.dark, mb: 0.5 }} />
+                                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
+                                                {(predictionResponse.info.water * (predictionResponse.detect?.quantity || 1)).toFixed(1)}
+                                            </Typography>
+                                            <Typography variant="caption" sx={{ color: 'darkgray' }}>
+                                                Water (liters)
                                             </Typography>
                                         </Box>
                                     )}

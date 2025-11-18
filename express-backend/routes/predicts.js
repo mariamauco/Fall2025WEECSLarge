@@ -101,11 +101,10 @@ const updateUser = async (userID, detectionData) => {
   const pointsInc = RECYCLINGPOINTS[detectionData.category] ?? 0;
 
   await UserData.updateOne(
-    { _id: userId },
+    { _id: userID },
     { $inc: { points: pointsInc } },
-    { $ }
+    { $inc: {detectionsCount: 1} }
   );
-
 
 }
 
@@ -153,7 +152,7 @@ router.post('/detect', upload.single('image'), async (req, res) => {
   } else if (detectionsFromFlask.length > 0 && detectionsFromFlask[0].class_name) {
     cat = detectionsFromFlask[0].class_name;
   } else {
-    cat = 'unknown';
+    cat = 'Unknown';
   }
 
   const newDetection = new DetectionData({
@@ -162,7 +161,8 @@ router.post('/detect', upload.single('image'), async (req, res) => {
     category: cat,
     timestamp: new Date(),
     // allow user to input quantity. used to calculate total environsavings from category
-    quantity: quantity || 1
+    quantity: quantity || 1,
+    points: RECYCLINGPOINTS[cat] ?? 0
   });
 
   try {
@@ -201,6 +201,8 @@ router.post('/detect', upload.single('image'), async (req, res) => {
     detections: Array.isArray(prediction.detections) ? prediction.detections : (prediction.predictions || []),
     top_category: prediction.top_category || prediction.topCategory || null
   };
+
+  updateUser(user._id, cat);
 
   // return all info packaged to the frontend
   return res.status(200).json({
