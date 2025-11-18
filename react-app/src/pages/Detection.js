@@ -225,14 +225,14 @@ function Detection() {
                 sx={{
                     minHeight: '100vh',
                     display: 'flex',
-                    flexDirection: 'column',
+                    flexDirection: 'row',
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '100vw',
                     background: 'linear-gradient(135deg, #D4BFED 0%, #FCD5E5 50%, #E5EEC8 100%)',
                     paddingTop: '90px',
                     paddingBottom: '40px',
-                    paddingX: 0,
+                    paddingX: 4,
                     margin: 0,
                     gap: 4
                 }}
@@ -277,6 +277,15 @@ function Detection() {
                 </Typography>
             </Backdrop>
 
+            {/* Left Side - Camera and Buttons */}
+            <Box
+                sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: 3
+                }}
+            >
             {/* Camera Box */}
             <Paper
                 elevation={3}
@@ -382,8 +391,7 @@ function Detection() {
             <Box
                 sx={{
                     display: "flex",
-                    gap: 3,
-                    marginTop: 2
+                    gap: 3
                 }}
             >
                 <Button
@@ -449,8 +457,9 @@ function Detection() {
                     onChange={handleFileChange}
                 />
             </Box>
+            </Box>
 
-            {/* Stats Card */}
+            {/* Right Side - Stats Card */}
             {showResults && (
             <Paper
                     elevation={3}
@@ -459,7 +468,6 @@ function Detection() {
                         borderRadius: 3,
                         backgroundColor: "#fff",
                         padding: 3,
-                        marginTop: 2,
                         border: "2px solid #E0E0E0"
                     }}
                 >
