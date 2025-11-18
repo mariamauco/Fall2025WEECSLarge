@@ -13,23 +13,32 @@ const db = require("../db/connection.js");
 
 // POINTS PER CATEGORY
 const RECYCLINGPOINTS = {
-  Cardboard: 5,
-  Glass: 5,
-  Paper: 5,
-  Plastic: 5,
-  Metal: 10,
-  Battery: 20,
-  Keyboard: 20,
-  Microwave: 40,
-  Mobile: 35,
-  Mouse: 15,
-  Organic: 5,
-  PCB: 30,
-  Player: 20,
-  Printer: 35,
-  Television: 60,
-  Trash: 0,
-  WashingMachine: 80
+  'cardboard': 5,
+  'glass': 5,
+  'paper': 5,
+  'plastic': 5,
+  'metal': 10,
+  'battery': 20,
+  'keyboard': 20,
+  'microwave': 40,
+  'mobile': 35,
+  'mouse': 15,
+  'organic': 5,
+  'pCB': 30,
+  'player': 20,
+  'printer': 35,
+  'television': 60,
+  'trash': 0,
+  'washingmachine': 80
+};
+
+const getPointsForCategory = (cat) => {
+  if (!cat) return 0;
+  const target = String(cat).toLowerCase();
+  for (const [key, val] of Object.entries(RECYCLINGPOINTS)) {
+    if (String(key).toLowerCase() === target) return val;
+  }
+  return 0;
 };
 
 // Configure Multer for file storage
@@ -87,26 +96,26 @@ const handleDetect = async (file) => {
   }
 }
 
-const updateUser = async (userID, detectionData) => {
-  let user;
-  try{
-    user = await UserData.findOne({ userID });
+const updateUser = async (userID, category, quantity = 1) => {
+  try {
+    const user = await UserData.findById(userID);
     if (!user) {
-      return res.status(403).json({ error: "No user found." });
+      console.error('No user found for id', userID);
+      return;
     }
+
+    const perItem = getPointsForCategory(category);
+    const qty = Number(quantity) || 1;
+    const pointsInc = perItem * qty;
+
+    await UserData.updateOne(
+      { _id: userID },
+      { $inc: { points: pointsInc, detectionsCount: 1 } }
+    );
   } catch (error) {
-    console.error('Error finding user:', error);
-    return res.status(500).json({ error: 'Database error' });
+    console.error('Error updating user points:', error);
   }
-  const pointsInc = RECYCLINGPOINTS[detectionData.category] ?? 0;
-
-  await UserData.updateOne(
-    { _id: userID },
-    { $inc: { points: pointsInc } },
-    { $inc: {detectionsCount: 1} }
-  );
-
-}
+};
 
 router.post('/detect', upload.single('image'), async (req, res) => {
   console.log('Upload request, req.file =', req.file);
@@ -162,7 +171,7 @@ router.post('/detect', upload.single('image'), async (req, res) => {
     timestamp: new Date(),
     // allow user to input quantity. used to calculate total environsavings from category
     quantity: quantity || 1,
-    points: RECYCLINGPOINTS[cat] ?? 0
+    points: getPointsForCategory(cat) * (Number(quantity) || 1)
   });
 
   try {
