@@ -12,13 +12,13 @@ const JWT_SECRET = process.env.JWT_SECRET; //jwt secret key
 
 // router.get("/history") //consider deleting if history is inside userStats
 
-router.post("/jwt", async (req,res) =>{
+router.get("/jwt", async (req,res) =>{
   const tokenHeaderKey = 'jwt-token';
   const token = req.headers[tokenHeaderKey];
   try {
     const verified = null;
     if (token)
-      verified = jwt.verify(token, jwtSecretKey);
+      verified = jwt.verify(token, JWT_SECRET);
     if (verified) {
       return res.status(200).json({ message: 'success' });
     } else {
