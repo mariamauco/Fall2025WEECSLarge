@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { useRef, useState, useEffect } from "react";
-import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography } from "@mui/material";
+import { Box, Paper, Button, Container, createTheme, ThemeProvider, Typography, CircularProgress, Backdrop } from "@mui/material";
 import { Air, EmojiEvents, CheckCircle, Cancel, SignalCellularNullTwoTone } from '@mui/icons-material';
 import WaterDropIcon from '@mui/icons-material/WaterDrop';
 import EnergySavingsLeafIcon from '@mui/icons-material/EnergySavingsLeaf';
@@ -60,6 +60,7 @@ function Detection() {
     const [token, setToken] = useState(null);
     const [userName, setUserName] = useState("Guest");
     const [detection, setDetection] = useState(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -98,6 +99,10 @@ function Detection() {
             setMessage("Please enter an image")
             return;
         }
+        
+        setIsLoading(true);
+        setMessage(null);
+        
         try{
             const form = new FormData();
             // Multer expects the file field to be named "image"
@@ -164,6 +169,10 @@ function Detection() {
                 console.error('Upload error', error);
                 setUploadError('Network error');
                 setPredictionResponse(null);
+                setMessage('Network error occurred');
+                setMessageType('error');
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -200,6 +209,46 @@ function Detection() {
                     gap: 4
                 }}
             >
+            {/* Loading Backdrop */}
+            <Backdrop
+                open={isLoading}
+                sx={{
+                    color: '#fff',
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 3
+                }}
+            >
+                <CircularProgress 
+                    size={80} 
+                    thickness={4}
+                    sx={{ 
+                        color: theme.palette.primary.light 
+                    }} 
+                />
+                <Typography 
+                    variant="h5" 
+                    sx={{ 
+                        color: '#fff',
+                        fontWeight: 'bold',
+                        textAlign: 'center'
+                    }}
+                >
+                    Scanning your item...
+                </Typography>
+                <Typography 
+                    variant="body1" 
+                    sx={{ 
+                        color: 'rgba(255, 255, 255, 0.8)',
+                        textAlign: 'center'
+                    }}
+                >
+                    This may take a few seconds
+                </Typography>
+            </Backdrop>
+
             {message && (
                 <Typography sx={{ color: messageType === 'error' ? 'red' : 'green', mb: 2 }}>
                     {message}
@@ -344,6 +393,7 @@ function Detection() {
                     variant="contained"
                     size="large"
                     onClick={handleSubmit}
+                    disabled={isLoading}
                     sx={{
                         borderColor: theme.palette.secondary.dark,
                         color: theme.palette.secondary.dark,
@@ -359,9 +409,13 @@ function Detection() {
                             borderColor: theme.palette.secondary.dark,
                             backgroundColor: theme.palette.secondary.light,
                             color: theme.palette.secondary.dark
+                        },
+                        "&:disabled": {
+                            backgroundColor: "#f5f5f5",
+                            color: "#ccc"
                         }
                     }}>
-                    Submit
+                    {isLoading ? 'Detecting...' : 'Submit'}
                 </Button>
 
                 {/* File input */}
