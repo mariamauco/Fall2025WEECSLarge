@@ -37,6 +37,7 @@ function Detection() {
             catName: '',
             desc: '',
             disposalInfo: '',
+            links: '',
             co2: null,
             energy: null,
             water: null
@@ -404,7 +405,7 @@ function Detection() {
                                 {/* Top category and counts */}
                                 {predictionResponse.prediction?.top_category?.label && (
                                     <Typography variant="body2" sx={{ textAlign: 'center', color: 'text.secondary', mb: 1 }}>
-                                        Top: {predictionResponse.prediction.top_category.label} ({(predictionResponse.prediction.top_category.confidence || 0).toFixed(2)})
+                                        {predictionResponse.prediction.top_category.label} ({(predictionResponse.prediction.top_category.confidence || 0).toFixed(2)*100}% Confidence) 
                                     </Typography>
                                 )}
                                 {predictionResponse.prediction?.counts && Object.keys(predictionResponse.prediction.counts).length > 0 && (
@@ -415,24 +416,47 @@ function Detection() {
                                     </Box>
                                 )}
 
-                                {/* Recycle Indicator */}
-                                <Box
-                                    sx={{
-                                        backgroundColor: theme.palette.secondary.light,
-                                        borderRadius: 2,
-                                        padding: 2,
-                                        mb: 2,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        gap: 1.5
-                                    }}
-                                >
-                                    <CheckCircle sx={{ fontSize: 32, color: theme.palette.primary.dark }} />
-                                    <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.secondary.dark }}>
-                                        Recycle
-                                    </Typography>
-                                </Box>
+                                {/* Recycle Pink Box */}
+                                {/* Only if there's a detection */}
+                                {predictionResponse.info.disposalInfo && (
+                                    <Box sx={{
+                                            backgroundColor: theme.palette.secondary.light,
+                                            borderRadius: 2,
+                                            padding: 2,
+                                            mb: 2,
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            gap: 1.5,
+                                            textAlign: 'center'
+                                        }}>
+                                        {/* Recycle Indicator */}
+                                        <Box
+                                            sx={{
+                                            backgroundColor: theme.palette.secondary.light,
+                                            mt: 2,
+                                            display: 'flex',
+                                            flexDirection: 'row',
+                                            alignItems: 'center',
+                                            justifyContent: 'center'
+                                        }}>
+                                            <CheckCircle sx={{ fontSize: 32, color: theme.palette.primary.dark }} />
+                                            <Typography variant="h6" sx={{ fontWeight: 'bold', color: theme.palette.secondary.dark }}>
+                                            Recycle
+                                            </Typography>
+                                        </Box>
+                                        {/* Disposal Information */}
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
+                                            {predictionResponse.info.disposalInfo}
+                                        </Typography>
+                                        <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
+                                            Some helpful links to learn more:
+                                            {predictionResponse.info.links}
+                                        </Typography>
+                                    </Box>
+                                )}
+                                
 
                                 {/* Stats Grid (CO2 and Points) */}
                                 <Box
@@ -481,11 +505,11 @@ function Detection() {
                                     )}
 
                                     {/* Points Earned */}
-                                    {predictionResponse.points !== undefined && (
+                                    {predictionResponse.detect.points !== undefined && (
                                         <Box sx={{ textAlign: 'center' }}>
                                             <EmojiEvents sx={{ fontSize: 32, color: theme.palette.primary.dark, mb: 0.5 }} />
                                             <Typography variant="h6" sx={{ fontWeight: 'bold', color: 'dimgray' }}>
-                                                {predictionResponse.points}
+                                                {predictionResponse.detect.points}
                                             </Typography>
                                             <Typography variant="caption" sx={{ color: 'darkgray' }}>
                                                 Points
