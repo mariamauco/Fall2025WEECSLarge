@@ -5,7 +5,6 @@ import { Home, Login, Logout } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -53,11 +52,6 @@ function Navbar() {
         };
     }, [location]);
 
-    const handleLogout = () => {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-        navigate('/');
-    }
 
     return (
         <Box

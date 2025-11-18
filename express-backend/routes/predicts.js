@@ -11,8 +11,26 @@ const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
 //const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
 
-// NEED TO TEST: ADD TEST CATEGORY TO DATABASE
-
+// POINTS PER CATEGORY
+const RECYCLINGPOINTS = {
+  Cardboard: 5,
+  Glass: 5,
+  Paper: 5,
+  Plastic: 5,
+  Metal: 10,
+  Battery: 20,
+  Keyboard: 20,
+  Microwave: 40,
+  Mobile: 35,
+  Mouse: 15,
+  Organic: 5,
+  PCB: 30,
+  Player: 20,
+  Printer: 35,
+  Television: 60,
+  Trash: 0,
+  WashingMachine: 80
+};
 
 // Configure Multer for file storage
 const fs = require('fs');
@@ -67,6 +85,28 @@ const handleDetect = async (file) => {
     console.error('Error prediction in:', error);
     return null;
   }
+}
+
+const updateUser = async (userID, detectionData) => {
+  let user;
+  try{
+    user = await UserData.findOne({ userID });
+    if (!user) {
+      return res.status(403).json({ error: "No user found." });
+    }
+  } catch (error) {
+    console.error('Error finding user:', error);
+    return res.status(500).json({ error: 'Database error' });
+  }
+  const pointsInc = RECYCLINGPOINTS[detectionData.category] ?? 0;
+
+  await UserData.updateOne(
+    { _id: userId },
+    { $inc: { points: pointsInc } },
+    { $ }
+  );
+
+
 }
 
 router.post('/detect', upload.single('image'), async (req, res) => {

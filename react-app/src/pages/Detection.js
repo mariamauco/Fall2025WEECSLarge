@@ -90,8 +90,8 @@ function Detection() {
             // Multer expects the file field to be named "image"
             form.append('image', selectedFile, selectedFile.name); 
 
-            const username = localStorage.getItem('username') || 'testuser';
-            form.append('username', username);
+            const user = localStorage.getItem('user') || 'testuser';
+            form.append('username', JSON.parse(user).username); // parse the user json before passing the username
             form.append('quantity', '1');
 
             const token = localStorage.getItem('token'); // example
