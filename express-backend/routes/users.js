@@ -6,14 +6,34 @@ const jwt = require("jsonwebtoken"); //provides secure login token
 const UserData = require("../models/user.js"); //path to schema file
 const router = express.Router(); //attach to server.js later
 const db = require("../db/connection.js");
-//const JWT_SECRET = process.env.JWT_SECRET //jwt secret key
+const JWT_SECRET = process.env.JWT_SECRET; //jwt secret key
 
 // router.get("/userStats")
 
 // router.get("/history") //consider deleting if history is inside userStats
 
+router.post("/jwt", async (req,res) =>{
+  const tokenHeaderKey = 'jwt-token';
+  const token = req.headers[tokenHeaderKey];
+  try {
+    const verified = null;
+    if (token)
+      verified = jwt.verify(token, jwtSecretKey);
+    if (verified) {
+      return res.status(200).json({ message: 'success' });
+    } else {
+      // Access Denied
+      return res.status(401).json({ message: 'error' });
+    }
+  } catch (error) {
+    // Access Denied
+    return res.status(401).json({ message: 'error' });
+  }
+});
+
 router.post("/login", async (req, res) => {
   try{
+    const jwtSecret = JWT_SECRET;
     const { email, password } = req.body;
     //find user by email or username
     const identifier = (req.body.email || req.body.username || '').trim().toLowerCase();
@@ -32,10 +52,10 @@ router.post("/login", async (req, res) => {
     if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
     //create a token if email and pass are correct
     const token = jwt.sign(
-      { id: user._id, username: user.username },
-      "secret key from .env", //need to change to a env. variable
-      { expiresIn: "1h" }
-    );
+      { id: user._id, username: user.username,
+        expiresIn: "1h" }
+    , jwtSecret);
+
     //send response to frontend
     res.json({
       message: "Login successful!",
@@ -44,7 +64,8 @@ router.post("/login", async (req, res) => {
         id: user._id,
         username: user.username,
         email: user.email,
-        points: user.points
+        points: user.points,
+        token: token
       }
     });
   } catch (err) {
@@ -57,31 +78,39 @@ router.post("/login", async (req, res) => {
 router.post("/signup", async (req,res) =>{
     //API 
     try{
-        const{name, username, email, password} = req.body;
-        if(!name || !username || !email || !password){ 
-            return res.status(400).json({error:"All fields required"});
-        }
-        //check if user exists (username)
-        const userExists = await UserData.findOne({username});
-        if(userExists){
-            return res.status(400).json({error:"Username already exists"});
-        }
-        //check if user exists (email)
-        const emailExists = await UserData.findOne({email});
-        if(emailExists){
-            return res.status(400).json({error:"Email already linked to an account"});
-        }
+      console.log('Signup request body:', req.body);
+    const{name, username, email, password} = req.body;
+    if(!name || !username || !email || !password){ 
+      return res.status(400).json({error:"All fields required"});
+    }
 
-        //hash password, 11 salt rounds
-        const hashPassword = await bcrypt.hash(password,11);
+    // normalize inputs (store email and username in lowercase to match login lookup)
+    const normalizedUsername = String(username).trim().toLowerCase();
+    const normalizedEmail = String(email).trim().toLowerCase();
+    const displayName = String(name).trim();
 
-        //create user: look how to link to schema:
+    //check if user exists (username)
+    const userExists = await UserData.findOne({ username: normalizedUsername });
+    if(userExists){
+      return res.status(400).json({error:"Username already exists"});
+    }
+    //check if user exists (email)
+    const emailExists = await UserData.findOne({ email: normalizedEmail });
+    if(emailExists){
+      return res.status(400).json({error:"Email already linked to an account"});
+    }
+
+    //hash password, 11 salt rounds
+    const hashPassword = await bcrypt.hash(password,11);
+
+    //create user: ensure the hashed password is stored under the 'password' field
         const newUser = {
-            name,
-            username,
-            email,
-            hashPassword
-        };
+      name: displayName,
+      username: normalizedUsername,
+      email: normalizedEmail,
+      password: hashPassword
+    };
+        console.log('Creating new user object:', newUser);
         const result = await UserData.create(newUser);
 
         if(result && result._id){
@@ -91,10 +120,12 @@ router.post("/signup", async (req,res) =>{
             res.status(500).json({error: "Failed to create new user"});
         }   
 
-    }catch(err){
-        console.error(err);
-        res.status(500).json({error: "Error registering user"});
-    }
+  }catch(err){
+    console.error('Signup error:', err);
+    // return the validation message to help debugging (strip in production)
+    const msg = err && err.message ? err.message : 'Error registering user';
+    res.status(500).json({error: msg});
+  }
 } )//200 if created, 500 if not created
 
 module.exports = router; //can import so server.js can use /login route

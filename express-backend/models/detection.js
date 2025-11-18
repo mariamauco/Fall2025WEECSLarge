@@ -5,7 +5,7 @@ const DetectionSchema = new mongoose.Schema({
     userID:{type: mongoose.Schema.Types.ObjectId, ref: "User", required: true}, 
     itemName:{type: String, required: true},
     // references a specific category instance instead of the name of it
-    category:{type: mongoose.Schema.Types.ObjectId, ref: "Category", required: true},
+    category:{type: String, ref: "Category", required: true},
     // allow user to input quantity. used to calculate total environsavings from category
     quantity:{type: Number, default: 1}
 

@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import './App.css';
 import Navbar from './components/Navbar';
@@ -30,6 +31,34 @@ const theme = createTheme({
 });
 
 function App() {
+
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(null);
+
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    setToken(token)
+    if (!token) {
+        // No token: not authenticated
+        setUser(null);
+        return;
+    }
+    try{
+      fetch('http://138.197.16.179:5050/api/users/jwt', {
+        headers: {
+          'jwt-token': token,
+        },
+      })
+      .then((res) => res.json())
+    }catch (err) {
+        // network / server error — treat as not authenticated for now
+        console.error('Auth failed', err);
+        setToken(null);
+        setUser(null);
+      }
+  })
+
   return (
     <ThemeProvider theme={theme}>
       <Router>

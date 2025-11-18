@@ -1,6 +1,7 @@
 from flask import Flask, request, Response, jsonify, stream_with_context
 from ultralytics import YOLO
 from PIL import Image
+import base64
 import io
 
 app = Flask(__name__)
@@ -63,19 +64,36 @@ def predict_route():
     # run the predict function and store response in preds
     try:
         detections, buf = predict(image_bytes, return_image=True)
+        # Count detections by class name
+        material_counts = {}
+        for d in detections:
+            name = d["class_name"]
+            material_counts[name] = material_counts.get(name, 0) + 1
 
-        if buf:  # If an image was generated
-            from flask import send_file
-            return send_file(
-                buf,
-                mimetype="image/jpeg",
-                as_attachment=False
-            )
-        else:
-            return jsonify({"detections": detections})
+        top_category = None
+        if detections:
+            top = max(detections, key=lambda x: x.get('confidence', 0))
+            top_category = { 'label': top['class_name'], 'confidence': top['confidence'] }
+        
+        image_base64 = None
+        if buf:
+            buf.seek(0)
+            image_base64 = base64.b64encode(buf.getvalue()).decode('utf-8')
+            image_base64 = f"data:image/jpeg;base64,{image_base64}"
+
+        
+        return jsonify({
+            "detections": detections,
+            "counts": material_counts,
+            "top_category": top_category,
+            "annotated_image": image_base64
+        })
+
     except Exception as e:
-        # Return error message on model fail
-        return jsonify({'detections': [], 'error': f'model error: {str(e)}'}), 500
+        return jsonify({
+            "detections": [],
+            "error": f"model error: {str(e)}"
+        }), 500
 
 
 if __name__ == '__main__':

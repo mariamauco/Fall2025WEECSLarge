@@ -1,9 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useState, useEffect } from 'react';
 import { Box, Typography, IconButton, Button } from '@mui/material';
 import { Home, Login, Logout } from '@mui/icons-material';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Navbar() {
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -33,6 +35,29 @@ function Navbar() {
         setIsLoggedIn(false);
         navigate('/');
     };
+
+    // get most updated token
+    useEffect(() => {
+        const checkAuth = () => {
+            setIsLoggedIn(!!localStorage.getItem('token'));
+        };
+        checkAuth();
+
+        // react to token changes from other tabs/windows
+        const onStorage = (e) => {
+            if (e.key === 'token') checkAuth();
+        };
+        window.addEventListener('storage', onStorage);
+        return () => {
+            window.removeEventListener('storage', onStorage);
+        };
+    }, [location]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('token');
+        setIsLoggedIn(false);
+        navigate('/');
+    }
 
     return (
         <Box

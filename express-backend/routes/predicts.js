@@ -15,9 +15,18 @@ const db = require("../db/connection.js");
 
 
 // Configure Multer for file storage
+const fs = require('fs');
+
+// Use an absolute uploads path relative to the project root
+const UPLOAD_DIR = path.join(__dirname, '..', 'uploads');
+// Ensure the directory exists
+if (!fs.existsSync(UPLOAD_DIR)) {
+  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+}
+
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-      cb(null, 'uploads/'); // Directory to save uploaded images
+      cb(null, UPLOAD_DIR); // absolute directory to save uploaded images
   },
   filename: function (req, file, cb) {
       cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
@@ -27,7 +36,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // sends the image user uploaded to the flask server for detection
-const fs = require('fs');
 const FormData = require('form-data'); // to install: npm install form-data
 const fetch = require('node-fetch'); // to install: npm install form-data node-fetch@2
 
@@ -36,7 +44,8 @@ const handleDetect = async (file) => {
     // send the actual file as multipart/form-data to the flask server
     const form = new FormData();
     // multer sets file.path relative to project (e.g. 'uploads/xxxx'), make absolute
-    const filePath = path.join(__dirname, file.path);
+    // file.path will now be absolute because we set UPLOAD_DIR above
+    const filePath = file.path;
     form.append('image', fs.createReadStream(filePath));
     form.append('filename', file.filename);
 
@@ -61,6 +70,7 @@ const handleDetect = async (file) => {
 }
 
 router.post('/detect', upload.single('image'), async (req, res) => {
+  console.log('Upload request, req.file =', req.file);
   if (!req.file) {
     return res.status(400).send('No image uploaded.');
   }
@@ -82,11 +92,29 @@ router.post('/detect', upload.single('image'), async (req, res) => {
 
   // call detection service and wait for result
   const prediction = await handleDetect(req.file);
-  if (!prediction || !prediction.prediction) {
+  if (!prediction) {
     console.error('No prediction returned for file:', req.file.filename, 'response:', prediction);
     return res.status(500).json({ error: 'Prediction failed' });
   }
-  const cat = prediction.prediction;
+
+  // Normalize the expected response shape from the Flask server.
+  // Expected shape: { annotated_image, counts, detections, top_category }
+  const detectionsFromFlask = Array.isArray(prediction.detections) ? prediction.detections : [];
+  const countsFromFlask = prediction.counts || {};
+  const topCategory = prediction.top_category || null;
+
+  // Choose category to store: prefer top_category.label, then the highest-count key, then first detection class_name
+  let cat = null;
+  if (topCategory && topCategory.label) {
+    cat = topCategory.label;
+  } else if (Object.keys(countsFromFlask).length > 0) {
+    // pick the key with the highest count
+    cat = Object.keys(countsFromFlask).reduce((a, b) => countsFromFlask[a] >= countsFromFlask[b] ? a : b);
+  } else if (detectionsFromFlask.length > 0 && detectionsFromFlask[0].class_name) {
+    cat = detectionsFromFlask[0].class_name;
+  } else {
+    cat = 'unknown';
+  }
 
   const newDetection = new DetectionData({
     userID: user._id,
@@ -107,7 +135,8 @@ router.post('/detect', upload.single('image'), async (req, res) => {
   // fetch detection environmental info
   let info;
   try {
-    info = await Category.findOne({ catName: cat });
+    // use case-insensitive match for category name to be more robust
+    info = await Category.findOne({ catName: { $regex: new RegExp(`^${cat}$`, 'i') } });
     if (!info) {
       return res.status(404).json({ error: "No environmental info found." });
     }
