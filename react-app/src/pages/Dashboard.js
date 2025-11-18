@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment, Grid, Avatar } from '@mui/material';
-import {EmojiEvents, Air, Leaderboard, History, Recycling, EventRepeat, CameraAlt} from '@mui/icons-material';
+import {EmojiEvents, Air, Leaderboard, History, Recycling, CameraAlt} from '@mui/icons-material';
 import CardComponent from '../components/Card';
 import {useNavigate} from "react-router-dom";
 
@@ -33,7 +33,6 @@ function Dashboard() {
     const [userPoints, setUserPoints] = useState(0);
     const [userName, setUserName] = useState("Guest");
     const [totalRecycled, setTotalRecycled] = useState(0);
-    const [streak, setStreak] = useState(0);
     const [leaderboard, setLeaderboard] = useState([]);
     const [history, setHistory] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -106,10 +105,10 @@ function Dashboard() {
         fetchUserData();
     }, []);
 
-    const co2Saved = (totalRecycled * 0.4) * 0.6; // fake formula
+    const co2Saved = (totalRecycled * 0.4) * 0.6; // fake formula (NEEDS UPDATE!!!!)
 
-    // Define all the cards that will be displayed on the dashboard in order
-    const cards = [
+    // Define small cards (Points, CO2 Saved, Items Recycled)
+    const smallCards = [
         // Points card
         {
             title: "Your Points",
@@ -133,7 +132,7 @@ function Dashboard() {
         },
         // CO2 Saved card
         {
-            title: "CO2 Saved",
+            title: "CO₂ Saved",
             icon: <Air />,
             backgroundColor: "white",
             titleColor: "secondary.dark",
@@ -171,28 +170,11 @@ function Dashboard() {
             ),
             width: 200,
             height: 150
-        },
-        // Streak card
-        {
-            title: "Daily Streak",
-            icon: <EventRepeat />,
-            backgroundColor: "white",
-            titleColor: "secondary.dark",
-            cardInfo: (
-                <Box>
-                    <Typography variant="h2" sx={{
-                        fontSize: '48px',
-                        fontWeight: 'bold',
-                        marginBottom: '8px',
-                        color: 'dimgray'
-                    }}>
-                        {streak}
-                    </Typography>
-                </Box>
-            ),
-            width: 200,
-            height: 150
-        },
+        }
+    ];
+
+    // Define long cards (Leaderboard, History)
+    const longCards = [
         // Leaderboard card
         {
             title: "Leaderboard",
@@ -423,12 +405,29 @@ function Dashboard() {
                 </Button>
             </Box>
 
-            {/* Grid container for the cards */}
-            <Grid container spacing={3} justifyContent="center">
-                {/* Map through the cards and display them */}
-                {cards.map((card, index) => (
-                    // Each card is a grid item
+            {/* Grid container for small cards */}
+            <Grid container spacing={3} justifyContent="center" sx={{ mb: 4 }}>
+                {smallCards.map((card, index) => (
                     <Grid item xs={12} sm={6} md={4} key={index}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                            <CardComponent
+                                title={card.title}
+                                icon={card.icon}
+                                backgroundColor={card.backgroundColor}
+                                titleColor={card.titleColor}
+                                cardInfo={card.cardInfo}
+                                width={card.width}
+                                height={card.height}
+                            />
+                        </Box>
+                    </Grid>
+                ))}
+            </Grid>
+
+            {/* Grid container for long cards */}
+            <Grid container spacing={3} justifyContent="center">
+                {longCards.map((card, index) => (
+                    <Grid item xs={12} sm={6} md={6} key={index}>
                         <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                             <CardComponent
                                 title={card.title}

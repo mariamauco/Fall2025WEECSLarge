@@ -3,7 +3,7 @@ import * as React from 'react';
 import {Container, TextField, Typography, Box, Button, createTheme, ThemeProvider, Card, InputAdornment} from '@mui/material';
 import { Email, Lock } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import earthIcon from '../assets/earth_guy.png';
 
 let theme = createTheme({
@@ -34,6 +34,15 @@ function Login() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    
+    // Redirect to dashboard if already logged in
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        const user = localStorage.getItem('user');
+        if (token && user) {
+            navigate('/dashboard');
+        }
+    }, [navigate]);
     
     const handleSignUpClick = () => {
         navigate('/signup');

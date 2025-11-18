@@ -40,7 +40,7 @@ function SignUp() {
     const [messageType, setMessageType] = useState('error'); // 'error' | 'success'
 
     const handleLoginClick = () => {
-        navigate('/');
+        navigate('/login');
     };
 
     const handleSubmit = async () => {
@@ -74,7 +74,7 @@ function SignUp() {
                     name: name
                 }));
                 
-                setTimeout(() => navigate('/'), 600); // wait to display message
+                setTimeout(() => navigate('/dashboard'), 600); // wait to display message
             } else {
                 setMessageType('error');
                 setMessage(data.error);
