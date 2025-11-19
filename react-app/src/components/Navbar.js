@@ -104,10 +104,13 @@ function Navbar() {
                             '&:hover': {
                                 backgroundColor: 'rgba(196, 211, 153, 0.1)',
                                 color: 'primary.main'
-                            }
+                            },
+                            textTransform: 'none',
+                            fontWeight: 'bold',
+                            fontSize: '0.95rem',
                         }}
                     >
-                        <Home />
+                        <Home />Home
                     </IconButton>
                 )}
 
