@@ -35,6 +35,7 @@ function Dashboard() {
     const [totalRecycled, setTotalRecycled] = useState(0);
     const [leaderboard, setLeaderboard] = useState([]);
     const [history, setHistory] = useState([]);
+    const [totalCo2, setTotalCo2] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [token, setToken] = useState(null);
 
@@ -75,8 +76,12 @@ function Dashboard() {
                         try {
                             const historyResponse = await fetch(`http://138.197.16.179:5050/api/stats/history/${userId}`);
                             if (historyResponse.ok) {
-                                const historyData = await historyResponse.json();
+                                const json = await historyResponse.json();
+                                const historyData = json.detections;
+                                const co2 = json.totalCo2;
+                                
                                 setHistory(historyData || []);
+                                setTotalCo2(co2 ?? 0);
                             }
                         } catch (err) {
                             console.log('History endpoint not available yet');
@@ -104,8 +109,6 @@ function Dashboard() {
         
         fetchUserData();
     }, []);
-
-    const co2Saved = (totalRecycled * 0.4) * 0.6; // fake formula (NEEDS UPDATE!!!!)
 
     // Define small cards (Points, CO2 Saved, Items Recycled)
     const smallCards = [
@@ -142,7 +145,7 @@ function Dashboard() {
                         marginBottom: '8px',
                         color: 'dimgray'
                     }}>
-                        <Box component="span" sx={{ fontSize: '48px', fontWeight: 'bold' }}>{co2Saved.toFixed(1)}</Box>
+                        <Box component="span" sx={{ fontSize: '48px', fontWeight: 'bold' }}>{totalCo2.toFixed(1)}</Box>
                         <Box component="span" sx={{ fontSize: '18px', fontWeight: 'normal', color: 'darkgray' }}>lbs</Box>
                     </Typography>
                 </Box>

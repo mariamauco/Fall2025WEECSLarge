@@ -1,6 +1,7 @@
 const express = require('express');
 const Detection = require('../models/detection');
 const UserData = require('../models/user');
+const Category = require('../models/category');
 const router = express.Router();
 
 //GET /api/stats: This route should return a user’s points, and maybe how many recycled
@@ -38,8 +39,19 @@ router.get('/history/:userId', async (req, res) => {
     //sorts by newest detections to oldest
     const detections = await Detection.find({ userID: userId }).sort({ createdAt: -1 });
 
+    // find total co2
+    let totalCo2 = 0;
+    if (detections.length > 0) {
+      for (const det of detections) {
+        // look up the category by name and get its co2
+        const category = await Category.findOne({ name: det.catName });
+        const co2 = category ? (Number(category.co2) || 0) : 0;
+        totalCo2 += co2 * det.quantity; // add that co2 to the total
+      }
+    }
+    
     //returns json of detections; json will be empty if no detections
-    res.status(200).json(detections);
+    res.status(200).json(detections, totalCo2);
 
   } catch (err) {
     console.error('Error fetching user detection history:', err);
