@@ -41,12 +41,17 @@ router.get('/history/:userId', async (req, res) => {
 
     // find total co2
     let totalCo2 = 0;
+    console.log(totalCo2);
     if (detections.length > 0) {
       for (const det of detections) {
         // look up the category by name and get its co2
-        const category = await Category.findOne({ catName: det.category });
-        const co2 = category ? (Number(category.co2) || 0) : 0;
+        const category = await Category
+          .findOne({ catName: det.category })
+          .collation({locale: 'en', strength: 2});
+        console.log(category);
+        const co2 = category ? (parseFloat(category.co2) || 0) : 0;
         totalCo2 += co2 * det.quantity; // add that co2 to the total
+        console.log(totalCo2);
       }
     }
     

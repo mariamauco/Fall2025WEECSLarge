@@ -145,7 +145,7 @@ function Dashboard() {
                         marginBottom: '8px',
                         color: 'dimgray'
                     }}>
-                        <Box component="span" sx={{ fontSize: '48px', fontWeight: 'bold' }}>{totalCo2.toFixed(1)}</Box>
+                        <Box component="span" sx={{ fontSize: '48px', fontWeight: 'bold' }}>{(Number(totalCo2) || 0).toFixed(1)}</Box>
                         <Box component="span" sx={{ fontSize: '18px', fontWeight: 'normal', color: 'darkgray' }}>lbs</Box>
                     </Typography>
                 </Box>
