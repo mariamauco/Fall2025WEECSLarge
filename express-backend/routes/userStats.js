@@ -44,14 +44,14 @@ router.get('/history/:userId', async (req, res) => {
     if (detections.length > 0) {
       for (const det of detections) {
         // look up the category by name and get its co2
-        const category = await Category.findOne({ name: det.catName });
+        const category = await Category.findOne({ catName: det.category });
         const co2 = category ? (Number(category.co2) || 0) : 0;
         totalCo2 += co2 * det.quantity; // add that co2 to the total
       }
     }
     
     //returns json of detections; json will be empty if no detections
-    res.status(200).json(detections, totalCo2);
+    res.status(200).json({detections, totalCo2});
 
   } catch (err) {
     console.error('Error fetching user detection history:', err);
