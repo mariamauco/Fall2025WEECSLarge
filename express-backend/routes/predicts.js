@@ -76,7 +76,7 @@ const handleDetect = async (file) => {
     form.append('image', fs.createReadStream(filePath));
     form.append('filename', file.filename);
 
-    const response = await fetch('http://138.197.16.179:5055/predict', {
+    const response = await fetch('http://localhost:5055/predict', {
       method: 'POST',
       headers: form.getHeaders(),
       body: form

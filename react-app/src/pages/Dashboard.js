@@ -63,7 +63,7 @@ function Dashboard() {
                     
                     if (userId) {
                         // Fetch user stats
-                        const statsResponse = await fetch(`http://138.197.16.179:5050/api/stats/${userId}`);
+                        const statsResponse = await fetch(`/api/stats/${userId}`);
                         
                         if (statsResponse.ok) {
                             const statsData = await statsResponse.json();
@@ -74,7 +74,7 @@ function Dashboard() {
                         
                         // Fetch user history
                         try {
-                            const historyResponse = await fetch(`http://138.197.16.179:5050/api/stats/history/${userId}`);
+                            const historyResponse = await fetch(`/api/stats/history/${userId}`);
                             if (historyResponse.ok) {
                                 const json = await historyResponse.json();
                                 const historyData = json.detections;
@@ -91,7 +91,7 @@ function Dashboard() {
                 
                 // Fetch leaderboard
                 try {
-                    const leaderboardResponse = await fetch('http://138.197.16.179:5050/api/stats/leaderboard');
+                    const leaderboardResponse = await fetch('/api/stats/leaderboard');
                     if (leaderboardResponse.ok) {
                         const leaderboardData = await leaderboardResponse.json();
                         setLeaderboard(leaderboardData || []);

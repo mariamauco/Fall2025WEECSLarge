@@ -47,7 +47,7 @@ function App() {
 
     const checkAuth = async () => {
       try {
-        const res = await fetch('http://138.197.16.179:5050/api/users/jwt', {
+        const res = await fetch('/api/users/jwt', {
           headers: {
             'jwt-token': myToken,
           },
