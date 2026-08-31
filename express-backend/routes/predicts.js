@@ -76,7 +76,8 @@ const handleDetect = async (file) => {
     form.append('image', fs.createReadStream(filePath));
     form.append('filename', file.filename);
 
-    const response = await fetch('http://localhost:5055/predict', {
+    const flaskUrl = process.env.FLASK_URL || 'http://localhost:5055';
+    const response = await fetch(`${flaskUrl}/predict`, {
       method: 'POST',
       headers: form.getHeaders(),
       body: form

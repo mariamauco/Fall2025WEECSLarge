@@ -1,0 +1,89 @@
+services:
+  flask-dev:
+    build:
+      context: ./flask-backend
+      dockerfile: Dockerfile
+    profiles: [dev]
+    ports:
+      - "5055:5055"
+    volumes:
+      - ./flask-backend:/app
+    restart: "no"
+
+  express-dev:
+    build:
+      context: ./express-backend
+      dockerfile: Dockerfile
+    profiles: [dev]
+    env_file:
+      - ./express-backend/config.env
+    environment:
+      PORT: 5050
+      FLASK_URL: http://flask-dev:5055
+    ports:
+      - "5050:5050"
+    volumes:
+      - ./express-backend:/app
+      - express_node_modules:/app/node_modules
+      - ./express-backend/uploads:/app/uploads
+    depends_on:
+      - flask-dev
+    restart: "no"
+
+  react-dev:
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile.dev
+    profiles: [dev]
+    environment:
+      HOST: 0.0.0.0
+      CHOKIDAR_USEPOLLING: "true"
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./react-app:/app
+      - react_node_modules:/app/node_modules
+    depends_on:
+      - express-dev
+    restart: "no"
+
+  flask-prod:
+    build:
+      context: ./flask-backend
+      dockerfile: Dockerfile
+    profiles: [prod]
+    expose:
+      - "5055"
+    restart: always
+
+  express-prod:
+    build:
+      context: ./express-backend
+      dockerfile: Dockerfile
+    profiles: [prod]
+    env_file:
+      - ./express-backend/config.env
+    environment:
+      NODE_ENV: production
+      PORT: 5050
+      FLASK_URL: http://flask-prod:5055
+    expose:
+      - "5050"
+    depends_on:
+      - flask-prod
+    restart: always
+
+  react-prod:
+    build:
+      context: ./react-app
+      dockerfile: Dockerfile.prod
+    profiles: [prod]
+    ports:
+      - "5000:5000"
+    depends_on:
+      - express-prod
+    restart: always
+
+volumes:
+  express_node_modules:
+  react_node_modules:
